@@ -152,14 +152,14 @@ class Color {
 
 Color.hexToRGB = function(hexValue) {
   // Ex. 'FFFFFF' => '[255,255,255]'
-  var colorValue = parseInt(hexValue, 16);
+  const colorValue = parseInt(hexValue, 16);
   return [(colorValue >> 16) & 255, (colorValue >> 8) & 255, colorValue & 255];
 };
 
 Color.rgbToHex = function(...rgbValues) {
   // Ex. '[255,255,255]' => 'FFFFFF'
   return rgbValues.reduce((cumulativeHexValue, rgbValue) => {
-    var hexValue = Number(rgbValue).toString(16);
+    let hexValue = Number(rgbValue).toString(16);
     if(hexValue.length == 1) {
       hexValue = '0' + hexValue;
     }
@@ -216,7 +216,7 @@ class ColorPicker extends HTMLElement {
    * @param {!Event} event
    */
   onManualColorChange_ = (event) => {
-    var newColor = event.detail.color;
+    const newColor = event.detail.color;
     if (!this.selectedColor.equals(newColor)) {
       this.selectedColor = newColor;
       this.visualColorPicker_.setSelectedColor(newColor);
@@ -298,7 +298,7 @@ class ManualColorPicker extends HTMLElement {
    * @param {!Event} event
    */
   onFormatChange_ = (event) => {
-    var newColorFormat = event.detail.colorFormat;
+    const newColorFormat = event.detail.colorFormat;
     this.colorValueContainers_.forEach((colorValueContainer) => {
       if (colorValueContainer.colorFormat === newColorFormat) {
         colorValueContainer.show();
@@ -312,7 +312,7 @@ class ManualColorPicker extends HTMLElement {
    * @param {!Event} event
    */
   onManualColorChange_ = (event) => {
-    var newColor = event.detail.color;
+    const newColor = event.detail.color;
     this.colorValueContainers_.forEach((colorValueContainer) =>
         colorValueContainer.color = newColor);
   }
