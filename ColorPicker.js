@@ -366,6 +366,9 @@ class ColorValueContainer extends HTMLElement {
             channelValueContainer.channelValue));
   }
 
+  /**
+   * @param {!Color} color
+   */
   set color(color) {
     this.channelValueContainers_.forEach((channelValueContainer) =>
         channelValueContainer.setValue(color));
