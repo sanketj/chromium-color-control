@@ -23,13 +23,18 @@ manual-color-picker {
   height: 28%;
 }
 
-color-value-container {
+color-value-container:not(.hidden-color-value-container) {
   display: flex;
   flex-direction: row;
   height: 32px;
   margin-left: 10%;
   margin-top: 2%;
   width: 171px;
+}
+
+.hidden-color-value-container,
+.hidden-format-label {
+  display: none;
 }
 
 input {
@@ -39,7 +44,12 @@ input {
   box-sizing: border-box;
   font-family: inherit;
   font-size: 14px;
+  min-width: 0;
   text-align: center;
+}
+
+color-value-container > input:not(:first-child) {
+  margin-left: 1%;
 }
 
 format-toggler {
@@ -55,7 +65,7 @@ format-toggler:hover {
   background-color: #F7F7F7;
 }
 
-format-label {
+format-label:not(.hidden-format-label) {
   border-radius: 2px;
   display: flex;
   flex-direction: row;
