@@ -167,25 +167,25 @@ class Color {
    */
   static hexToRGB(hexValue) {
     // Ex. 'FFFFFF' => '[255,255,255]'
-  const colorValue = parseInt(hexValue, 16);
-  return [(colorValue >> 16) & 255, (colorValue >> 8) & 255, colorValue & 255];
-}
+    const colorValue = parseInt(hexValue, 16);
+    return [(colorValue >> 16) & 255, (colorValue >> 8) & 255, colorValue & 255];
+  }
 
-/**
- * @param {...number} rgbValues
- * @returns {string}
- */
-static rgbToHex(...rgbValues) {
-  // Ex. '[255,255,255]' => 'FFFFFF'
-  return rgbValues.reduce((cumulativeHexValue, rgbValue) => {
-    let hexValue = Number(rgbValue).toString(16);
-    if(hexValue.length == 1) {
-      hexValue = '0' + hexValue;
-    }
-    return (cumulativeHexValue + hexValue);
-  }, '')
-  .toUpperCase();
-}
+  /**
+   * @param {...number} rgbValues
+   * @returns {string}
+   */
+  static rgbToHex(...rgbValues) {
+    // Ex. '[255,255,255]' => 'FFFFFF'
+    return rgbValues.reduce((cumulativeHexValue, rgbValue) => {
+      let hexValue = Number(rgbValue).toString(16);
+      if(hexValue.length == 1) {
+        hexValue = '0' + hexValue;
+      }
+      return (cumulativeHexValue + hexValue);
+    }, '')
+    .toUpperCase();
+  }
 }
 
 /**
