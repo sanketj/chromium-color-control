@@ -97,6 +97,9 @@ class Color {
     return (this.hexValue === other.hexValue);
   }
 
+  /**
+   * @returns {string}
+   */
   get hexValue() {
     this.computeHexValue_();
     return this.hexValue_;
@@ -116,16 +119,25 @@ class Color {
     return '#' + this.hexValue;
   }
 
+  /**
+   * @returns {number} between 0 and 255
+   */
   get rValue() {
     this.computeRGBValues_();
     return this.rValue_;
   }
 
+  /**
+   * @returns {number} between 0 and 255
+   */
   get gValue() {
     this.computeRGBValues_();
     return this.gValue_;
   }
 
+  /**
+   * @returns {number} between 0 and 255
+   */
   get bValue() {
     this.computeRGBValues_();
     return this.bValue_;
@@ -148,15 +160,22 @@ class Color {
   asRGB() {
     return 'rgb(' + this.rgbValues().join() + ')';
   }
-}
 
-Color.hexToRGB = function(hexValue) {
-  // Ex. 'FFFFFF' => '[255,255,255]'
+  /**
+   * @param {string} hexValue
+   * @returns {number[]}
+   */
+  static hexToRGB(hexValue) {
+    // Ex. 'FFFFFF' => '[255,255,255]'
   const colorValue = parseInt(hexValue, 16);
   return [(colorValue >> 16) & 255, (colorValue >> 8) & 255, colorValue & 255];
-};
+}
 
-Color.rgbToHex = function(...rgbValues) {
+/**
+ * @param {...number} rgbValues
+ * @returns {string}
+ */
+static rgbToHex(...rgbValues) {
   // Ex. '[255,255,255]' => 'FFFFFF'
   return rgbValues.reduce((cumulativeHexValue, rgbValue) => {
     let hexValue = Number(rgbValue).toString(16);
@@ -166,7 +185,8 @@ Color.rgbToHex = function(...rgbValues) {
     return (cumulativeHexValue + hexValue);
   }, '')
   .toUpperCase();
-};
+}
+}
 
 /**
  * ColorPicker: Custom element providing a color picker implementation.
