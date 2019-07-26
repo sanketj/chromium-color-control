@@ -46,6 +46,7 @@ input {
   font-size: 14px;
   min-width: 0;
   text-align: center;
+  text-transform: uppercase;
 }
 
 color-value-container > input:not(:first-child) {

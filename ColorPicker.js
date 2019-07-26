@@ -80,7 +80,7 @@ class Color {
     } else {
       switch(colorStringOrFormat) {
         case ColorFormat.HEX:
-          this.hexValue_ = colorValues[0];
+          this.hexValue_ = colorValues[0].toLowerCase();
           break;
         case ColorFormat.RGB:
           [this.rValue_, this.gValue_, this.bValue_] = colorValues.map(Number);
@@ -166,7 +166,7 @@ class Color {
    * @returns {number[]}
    */
   static hexToRGB(hexValue) {
-    // Ex. 'FFFFFF' => '[255,255,255]'
+    // Ex. 'ffffff' => '[255,255,255]'
     const colorValue = parseInt(hexValue, 16);
     return [(colorValue >> 16) & 255, (colorValue >> 8) & 255, colorValue & 255];
   }
@@ -176,15 +176,14 @@ class Color {
    * @returns {string}
    */
   static rgbToHex(...rgbValues) {
-    // Ex. '[255,255,255]' => 'FFFFFF'
+    // Ex. '[255,255,255]' => 'ffffff'
     return rgbValues.reduce((cumulativeHexValue, rgbValue) => {
       let hexValue = Number(rgbValue).toString(16);
       if(hexValue.length == 1) {
         hexValue = '0' + hexValue;
       }
       return (cumulativeHexValue + hexValue);
-    }, '')
-    .toUpperCase();
+    }, '');
   }
 }
 
