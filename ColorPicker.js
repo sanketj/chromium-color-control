@@ -500,7 +500,7 @@ class ChannelValueContainer extends HTMLInputElement {
           if (value.match(/^\d+$/) && (0 <= value) && (value <= 255)) {
             // Ex. '12' => this.channelValue_ == '12'
             // Ex. '012' => this.channelValue_ == '12'
-            this.channelValue_ = value.replace(/^0+/, '');
+            this.channelValue_ = value.replace(/^0+(?!$)/, '');
           }
           break;
         // TODO(crbug.com/982088): Add support for HSL
