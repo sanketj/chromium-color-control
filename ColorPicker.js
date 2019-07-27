@@ -486,10 +486,10 @@ class ChannelValueContainer extends HTMLInputElement {
       switch(this.colorChannel_) {
         case ColorChannel.HEX:
           if (value.startsWith('#')) {
-            value = value.substr(1);
-            if (value.match(/^[0-9a-fA-F]+$/)) {
-              // Ex. 'FFFFFF' => this.channelValue_ == 'FFFFFF'
-              // Ex. 'FF' => this.channelValue_ == '0000FF'
+            value = value.substr(1).toLowerCase();
+            if (value.match(/^[0-9a-f]+$/)) {
+              // Ex. 'ffffff' => this.channelValue_ == 'ffffff'
+              // Ex. 'ff' => this.channelValue_ == '0000ff'
               this.channelValue_ = ('000000' + value).slice(-6);
             }
           }
