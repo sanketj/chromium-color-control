@@ -498,8 +498,6 @@ class ChannelValueContainer extends HTMLInputElement {
         case ColorChannel.G:
         case ColorChannel.B:
           if (value.match(/^\d+$/) && (0 <= value) && (value <= 255)) {
-            // Ex. '12' => this.channelValue_ == '12'
-            // Ex. '012' => this.channelValue_ == '12'
             this.channelValue_ = Number(value);
           }
           break;
