@@ -528,7 +528,7 @@ class FormatToggler extends HTMLElement {
       this.rgbFormatLabel_,
       // TODO(crbug.com/982088): Add support for HSL
     ];
-    this.adjustColorFormatLabelVisibility();
+    this.adjustFormatLabelVisibility();
 
     this.upDownIcon_ = document.createElement('span');
     this.upDownIcon_.innerHTML =
@@ -545,7 +545,7 @@ class FormatToggler extends HTMLElement {
     this.addEventListener('mousedown', (event) => event.preventDefault());
   }
 
-  adjustColorFormatLabelVisibility() {
+  adjustFormatLabelVisibility() {
     this.colorFormatLabels_.forEach((colorFormatLabel) => {
       if (colorFormatLabel.colorFormat === this.currentColorFormat_) {
         colorFormatLabel.show();
@@ -562,7 +562,7 @@ class FormatToggler extends HTMLElement {
       this.currentColorFormat_ = ColorFormat.HEX;
     }
     // TODO(crbug.com/982088): Add support for HSL
-    this.adjustColorFormatLabelVisibility();
+    this.adjustFormatLabelVisibility();
 
     this.dispatchEvent(new CustomEvent('format-change', {
       detail: {
