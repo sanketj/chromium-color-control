@@ -301,7 +301,7 @@ class ManualColorPicker extends HTMLElement {
       this.rgbValueContainer_,
       // TODO(crbug.com/982088): Add support for HSL
     ];
-    this.formatToggler_ = new FormatToggler();
+    this.formatToggler_ = new FormatToggler(ColorFormat.RGB);
     this.append(...this.colorValueContainers_, this.formatToggler_);
 
     this.hexValueContainer_.hide();
@@ -514,9 +514,13 @@ window.customElements.define('channel-value-container',
  * FormatToggler: Button that powers switching between different color formats.
  */
 class FormatToggler extends HTMLElement {
-  constructor() {
+  /**
+   * @param {!ColorFormat} initialColorFormat
+   */
+  constructor(initialColorFormat) {
     super();
 
+    this.currentColorFormat_ = initialColorFormat;
     this.hexFormatLabel_ = new FormatLabel(ColorFormat.HEX);
     this.rgbFormatLabel_ = new FormatLabel(ColorFormat.RGB);
     this.colorFormatLabels_ = [
@@ -524,6 +528,7 @@ class FormatToggler extends HTMLElement {
       this.rgbFormatLabel_,
       // TODO(crbug.com/982088): Add support for HSL
     ];
+    this.adjustColorFormatLabelVisibility();
 
     this.upDownIcon_ = document.createElement('span');
     this.upDownIcon_.innerHTML =
@@ -536,29 +541,32 @@ class FormatToggler extends HTMLElement {
 
     this.append(...this.colorFormatLabels_, this.upDownIcon_);
 
-    this.hexFormatLabel_.hide();
-    this.rgbFormatLabel_.show();
-
     this.addEventListener('click', this.onClick_);
     this.addEventListener('mousedown', (event) => event.preventDefault());
   }
 
+  adjustColorFormatLabelVisibility() {
+    this.colorFormatLabels_.forEach((colorFormatLabel) => {
+      if (colorFormatLabel.colorFormat === this.currentColorFormat_) {
+        colorFormatLabel.show();
+      } else {
+        colorFormatLabel.hide();
+      }
+    });
+  }
+
   onClick_ = () => {
-    let newColorFormat = undefined;
-    if (this.hexFormatLabel_.isVisible) {
-      this.rgbFormatLabel_.show();
-      this.hexFormatLabel_.hide();
-      newColorFormat = this.rgbFormatLabel_.colorFormat;
-    } else if (this.rgbFormatLabel_.isVisible) {
-      this.hexFormatLabel_.show();
-      this.rgbFormatLabel_.hide();
-      newColorFormat = this.hexFormatLabel_.colorFormat;
+    if (this.currentColorFormat_ == ColorFormat.HEX) {
+      this.currentColorFormat_ = ColorFormat.RGB;
+    } else if (this.currentColorFormat_ == ColorFormat.RGB) {
+      this.currentColorFormat_ = ColorFormat.HEX;
     }
     // TODO(crbug.com/982088): Add support for HSL
+    this.adjustColorFormatLabelVisibility();
 
     this.dispatchEvent(new CustomEvent('format-change', {
       detail: {
-        colorFormat: newColorFormat
+        colorFormat: this.currentColorFormat_
       }
     }));
   }
@@ -600,10 +608,6 @@ class FormatLabel extends HTMLElement {
 
   hide() {
     return this.classList.add('hidden-format-label');
-  }
-
-  get isVisible() {
-    return !this.classList.contains('hidden-format-label');
   }
 }
 window.customElements.define('format-label', FormatLabel);
