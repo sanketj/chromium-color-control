@@ -458,19 +458,19 @@ class ChannelValueContainer extends HTMLInputElement {
         }
         break;
       case ColorChannel.R:
-        if (this.channelValue_ != color.rValue) {
+        if (this.channelValue_ !== color.rValue) {
           this.channelValue_ = color.rValue;
           this.value = this.channelValue_;
         }
         break;
       case ColorChannel.G:
-        if (this.channelValue_ != color.gValue) {
+        if (this.channelValue_ !== color.gValue) {
           this.channelValue_ = color.gValue;
           this.value = this.channelValue_;
         }
         break;
       case ColorChannel.B:
-        if (this.channelValue_ != color.bValue) {
+        if (this.channelValue_ !== color.bValue) {
           this.channelValue_ = color.bValue;
           this.value = this.channelValue_;
         }
