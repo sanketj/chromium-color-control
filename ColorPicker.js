@@ -80,7 +80,6 @@ class Color {
         [this.hValue_, this.sValue_, this.lValue_] =
             colorStringOrFormat.substring(4, colorStringOrFormat.length - 1)
             .split(',').map(Number);
-        this.createdAsHSL_ = true;
       }
     } else {
       switch(colorStringOrFormat) {
@@ -92,7 +91,6 @@ class Color {
           break;
         case ColorFormat.HSL:
           [this.hValue_, this.sValue_, this.lValue_] = colorValues.map(Number);
-          this.createdAsHSL_ = true;
           break;
       }
     }
@@ -102,22 +100,6 @@ class Color {
    * @param {!Color} other
    */
   equals(other) {
-    // The Color class only allows integer color values, and in an integer
-    // color value space, multiple Hex/RGB values can map to the same HSL
-    // value. Because of this, when comparing a Hex/RGB value and a HSL value,
-    // we cannot check equality by converting the HSL value as it will match
-    // only one of its multiple possible Hex/RGB values. Instead, we need to
-    // convert the Hex/RGB value to HSL, and perform a HSL-based comparison.
-    // When working with non-HSL values though, we want the greater precision
-    // of a Hex/RGB-based comparison. To satisfy these requirements, we check
-    // for HSL-based equivalency if the user explicitly created one of the
-    // colors in the HSL format (indicated by the 'createdAsHSL_' flag).
-    // Otherwise, we perform a Hex-based comparison.
-    if (this.createdAsHSL_ || other.createdAsHSL_) {
-      const otherHSLValues = other.hslValues();
-      return this.hslValues().every((value, index) =>
-          otherHSLValues[index] === value);
-    }
     return (this.hexValue === other.hexValue);
   }
 
