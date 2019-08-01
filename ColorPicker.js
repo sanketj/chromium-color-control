@@ -318,13 +318,13 @@ class Color {
         // max === bValue
         hValue = ((rValue - gValue) / diff) + 4;
       }
-      hValue = hValue * 60;
+      hValue *= 60;
       if (hValue < 0) {
         hValue += 360;
       }
       sValue = (diff / (1 - Math.abs(2 * lValue - 1))) * 100;
     }
-    lValue = lValue * 100;
+    lValue *= 100;
     return [hValue, sValue, lValue];
   }
 
