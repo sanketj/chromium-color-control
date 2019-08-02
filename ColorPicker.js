@@ -462,7 +462,7 @@ class ManualColorPicker extends HTMLElement {
       this.hslValueContainer_,
     ];
     this.currentColorFormat_ = ColorFormat.RGB;
-    this.adjustValueContainerVisibility();
+    this.adjustValueContainerVisibility_();
     this.formatToggler_ = new FormatToggler(this.currentColorFormat_);
     this.append(...this.colorValueContainers_, this.formatToggler_);
 
@@ -472,7 +472,7 @@ class ManualColorPicker extends HTMLElement {
     this.addEventListener('manual-color-change', this.onManualColorChange_);
   }
 
-  adjustValueContainerVisibility() {
+  adjustValueContainerVisibility_() {
     this.colorValueContainers_.forEach((colorValueContainer) => {
       if (colorValueContainer.colorFormat === this.currentColorFormat_) {
         colorValueContainer.show();
@@ -487,7 +487,7 @@ class ManualColorPicker extends HTMLElement {
    */
   onFormatChange_ = (event) => {
     this.currentColorFormat_ = event.detail.colorFormat;
-    this.adjustValueContainerVisibility();
+    this.adjustValueContainerVisibility_();
   }
 
   /**
@@ -738,7 +738,7 @@ class FormatToggler extends HTMLElement {
       this.rgbFormatLabel_,
       this.hslFormatLabel_,
     ];
-    this.adjustFormatLabelVisibility();
+    this.adjustFormatLabelVisibility_();
 
     this.upDownIcon_ = document.createElement('span');
     this.upDownIcon_.innerHTML =
@@ -755,7 +755,7 @@ class FormatToggler extends HTMLElement {
     this.addEventListener('mousedown', (event) => event.preventDefault());
   }
 
-  adjustFormatLabelVisibility() {
+  adjustFormatLabelVisibility_() {
     this.colorFormatLabels_.forEach((colorFormatLabel) => {
       if (colorFormatLabel.colorFormat === this.currentColorFormat_) {
         colorFormatLabel.show();
@@ -773,7 +773,7 @@ class FormatToggler extends HTMLElement {
     } else if (this.currentColorFormat_ == ColorFormat.HSL) {
       this.currentColorFormat_ = ColorFormat.HEX;
     }
-    this.adjustFormatLabelVisibility();
+    this.adjustFormatLabelVisibility_();
 
     this.dispatchEvent(new CustomEvent('format-change', {
       detail: {
