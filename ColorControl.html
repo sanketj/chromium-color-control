@@ -7,9 +7,9 @@
     <body ondragstart="return false;" ondrop="return false;">
         <script src="ColorPicker.js"></script>
         <script>
-            // document.selectedColor = new Color(ColorFormat.RGB, 126, 255, 201);
-            //document.selectedColor = new Color("#7EFFC9");
-            document.selectedColor = new Color("rgb(126, 255, 201)");
+            document.selectedColor = new Color(ColorFormat.RGB, 234, 95, 176);
+            // document.selectedColor = new Color("#7EFFC9");
+            //document.selectedColor = new Color("rgb(126, 255, 201)");
             document.colorPicker = new ColorPicker(document.selectedColor, ColorFormat.RGB);
             document.body.append(document.colorPicker);
             document.colorPicker.addEventListener("color-change", () => {
