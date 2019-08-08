@@ -1132,7 +1132,7 @@ class HueSlider extends ColorSelectionArea {
           this.colorPalette_.nearestPointOnColorPalette(newPositionOrColor);
       this.colorSelectorRing_.shiftX(point.x - this.colorSelectorRing_.left);
     } else {
-      if (newPositionOrColor !== this.colorSelectorRing_.color) {
+      if (!newPositionOrColor.equals(this.colorSelectorRing_.color)) {
         const targetHValue = newPositionOrColor.hValue;
         const closestHValueIndex = this.colorPalette_.hslImageData
             .reduce((closestHValueIndexSoFar, currentHValue, index, array) => {
