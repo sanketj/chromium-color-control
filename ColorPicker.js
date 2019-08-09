@@ -589,8 +589,10 @@ class VisualColorPicker extends HTMLElement {
 window.customElements.define('visual-color-picker', VisualColorPicker);
 
 /**
- * EyeDropper:
- * TODO(FIXME: file bug):
+ * EyeDropper: Allows color selection from content outside the color picker.
+ *             (This is currently just a placeholder (for sizing) for a future
+ *             implementation.)
+ * TODO(http://crbug.com/992297): Implement eye dropper
  */
 class EyeDropper extends HTMLElement { }
 window.customElements.define('eye-dropper', EyeDropper);
