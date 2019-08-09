@@ -423,6 +423,11 @@ class ColorPicker extends HTMLElement {
                 this.manualColorPicker_,
                 this.submissionControls_);
 
+    this.visualColorPicker_.addEventListener('visual-color-picker-initialized',
+        this.initializeListeners_);
+  }
+
+  initializeListeners_ = () => {
     this.manualColorPicker_
         .addEventListener('manual-color-change', this.onManualColorChange_);
 
@@ -522,7 +527,19 @@ class VisualColorPicker extends HTMLElement {
     this.colorWell_ = new ColorWell(initialColor);
     this.prepend(this.colorWell_);
 
-    this.resizeObserver_ = new ResizeObserver(() => {
+    this.colorWell_.addEventListener('color-well-initialized', () => {
+      this.colorWell_.initialized_ = true;
+      this.initializeListeners_();
+    });
+
+    this.hueSlider_.addEventListener('hue-slider-initialized', () => {
+      this.hueSlider_.initialized_ = true;
+      this.initializeListeners_();
+    });
+  }
+
+  initializeListeners_ = () => {
+    if (this.colorWell_.initialized_ && this.hueSlider_.initialized_) {
       this.addEventListener('hue-slider-update', this.onHueSliderUpdate_);
       this.addEventListener('visual-color-change', this.onVisualColorChange_);
       this.colorWell_
@@ -537,10 +554,8 @@ class VisualColorPicker extends HTMLElement {
           .addEventListener('mousemove', this.onMouseMove_);
       document.documentElement.addEventListener('mouseup', this.onMouseUp_);
 
-      this.resizeObserver_.disconnect();
-      this.resizeObserver_ = null;
-    });
-    this.resizeObserver_.observe(this);
+      this.dispatchEvent(new CustomEvent('visual-color-picker-initialized'));
+    }
   }
 
   onHueSliderUpdate_ = () => {
@@ -996,6 +1011,8 @@ class ColorWell extends ColorSelectionArea {
 
       this.resizeObserver_.disconnect();
       this.resizeObserver_ = null;
+
+      this.dispatchEvent(new CustomEvent('color-well-initialized'));
     });
     this.resizeObserver_.observe(this);
   }
@@ -1105,6 +1122,8 @@ class HueSlider extends ColorSelectionArea {
 
       this.resizeObserver_.disconnect();
       this.resizeObserver_ = null;
+
+      this.dispatchEvent(new CustomEvent('hue-slider-initialized'));
     });
     this.resizeObserver_.observe(this);
   }
