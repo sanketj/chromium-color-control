@@ -160,8 +160,7 @@ class Color {
           Color.hexToRGB(this.hexValue_);
     } else if (this.hValue_ !== undefined) {
       [this.rValue_, this.gValue_, this.bValue_] =
-          Color.hslToRGB(this.hValue_, this.sValue_, this.lValue_)
-          .map(Math.round);
+          Color.hslToRGB(this.hValue_, this.sValue_, this.lValue_);
     }
   }
 
@@ -202,11 +201,10 @@ class Color {
       // Already computed.
     } else if (this.rValue_ !== undefined) {
       [this.hValue_, this.sValue_, this.lValue_] =
-          Color.rgbToHSL(this.rValue_, this.gValue_, this.bValue_)
-          .map(Math.round);
+          Color.rgbToHSL(this.rValue_, this.gValue_, this.bValue_);
     } else if (this.hexValue_ !== undefined) {
       [this.hValue_, this.sValue_, this.lValue_] =
-          Color.hexToHSL(this.hexValue_).map(Math.round);
+          Color.hexToHSL(this.hexValue_);
     }
   }
 
@@ -290,9 +288,9 @@ class Color {
         bValue = x;
       }
     }
-    rValue = (rValue + match) * 255;
-    gValue = (gValue + match) * 255;
-    bValue = (bValue + match) * 255;
+    rValue = Math.round((rValue + match) * 255);
+    gValue = Math.round((gValue + match) * 255);
+    bValue = Math.round((bValue + match) * 255);
     return [rValue, gValue, bValue];
   }
 
@@ -319,13 +317,13 @@ class Color {
         // max === bValue
         hValue = ((rValue - gValue) / diff) + 4;
       }
-      hValue *= 60;
+      hValue = Math.round(hValue * 60);
       if (hValue < 0) {
         hValue += 360;
       }
-      sValue = (diff / (1 - Math.abs(2 * lValue - 1))) * 100;
+      sValue = Math.round((diff / (1 - Math.abs(2 * lValue - 1))) * 100);
     }
-    lValue *= 100;
+    lValue = Math.round(lValue * 100);
     return [hValue, sValue, lValue];
   }
 
@@ -334,7 +332,7 @@ class Color {
    * @returns {string}
    */
   static hslToHex(...hslValues) {
-    return Color.rgbToHex(...Color.hslToRGB(...hslValues).map(Math.round));
+    return Color.rgbToHex(...Color.hslToRGB(...hslValues));
   }
 
   /**
@@ -695,8 +693,7 @@ class ColorPalette extends HTMLCanvasElement {
             if ((currentIndex % 4) === 0) {
               hslArray.push(...Color.rgbToHSL(rgbaArray[currentIndex],
                                               rgbaArray[currentIndex + 1],
-                                              rgbaArray[currentIndex + 2])
-                            .map(Math.round));
+                                              rgbaArray[currentIndex + 2]));
             }
             return hslArray;
           }, []);
