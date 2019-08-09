@@ -343,6 +343,17 @@ class Color {
   static hexToHSL(hexValue) {
     return Color.rgbToHSL(...Color.hexToRGB(hexValue));
   }
+
+  /**
+   * @param {number[]} colorTripleA RGB or HSL values
+   * @param {number[]} colorTripleB RGB or HSL values
+   * Both color triples must be of the same color format.
+   */
+  static distance(colorTripleA, colorTripleB) {
+    return Math.sqrt(Math.pow(colorTripleA[0] - colorTripleB[0], 2)
+        + Math.pow(colorTripleA[1] - colorTripleB[1], 2)
+        + Math.pow(colorTripleA[2] - colorTripleB[2], 2));
+  }
 }
 
 class Point {
@@ -941,7 +952,7 @@ class ColorWell extends ColorSelectionArea {
     this.initialized_ = false;
 
     window.addEventListener('load', () => {
-      this.initialize();
+      this.initialize_();
 
       this.colorSelectionRing_.addEventListener('color-selection-ring-update',
           this.onColorSelectionRingUpdate_);
@@ -950,7 +961,7 @@ class ColorWell extends ColorSelectionArea {
     });
   }
 
-  initialize() {
+  initialize_() {
     if (!this.initialized_) {
       let whiteGradient = this.colorPalette_.renderingContext
           .createLinearGradient(0, 0, this.colorPalette_.offsetWidth, 0);
@@ -977,21 +988,15 @@ class ColorWell extends ColorSelectionArea {
           this.colorPalette_.nearestPointOnColorPalette(newPositionOrColor);
       this.colorSelectionRing_.moveTo(point);
     } else {
-      function hslValueDistance(hslTripleA, hslTripleB) {
-        return Math.sqrt(Math.pow(hslTripleB[0] - hslTripleA[0], 2)
-            + Math.pow(hslTripleB[1] - hslTripleA[1], 2)
-            + Math.pow(hslTripleB[2] - hslTripleA[2], 2));
-      }
-
       const closestHSLValueIndex = this.colorPalette_.hslImageData
           .reduce((closestSoFar, {}, index, array) => {
             if ((index % 3) === 0) {
-              const currentHSLValueDistance = hslValueDistance([array[index],
-                array[index + 1], array[index + 2]],
-                  newPositionOrColor.hslValues());
+              const currentHSLValueDistance = Color.distance([array[index],
+                  array[index + 1], array[index + 2]],
+                    newPositionOrColor.hslValues());
               const closestHSLValueDistance =
-                hslValueDistance([array[closestSoFar], array[closestSoFar + 1],
-                  array[closestSoFar + 2]], newPositionOrColor.hslValues());
+                  Color.distance([array[closestSoFar], array[closestSoFar + 1],
+                    array[closestSoFar + 2]], newPositionOrColor.hslValues());
               if (currentHSLValueDistance < closestHSLValueDistance) {
                 return index;
               }
@@ -1014,8 +1019,10 @@ class ColorWell extends ColorSelectionArea {
    * @param {!Color} newColor
    */
   set selectedColor(newColor) {
-    this.selectedColor_ = newColor;
-    this.moveColorSelectionRingTo_(newColor);
+    if (!this.selectedColor_.equals(newColor)) {
+      this.selectedColor_ = newColor;
+      this.moveColorSelectionRingTo_(newColor);
+    }
   }
 
   get fillColor() {
@@ -1027,7 +1034,7 @@ class ColorWell extends ColorSelectionArea {
    */
   set fillColor(color) {
     this.fillColor_ = color;
-    this.initialize();
+    this.initialize_();
     this.colorPalette_.fillHue(color);
     this.colorSelectionRing_.updateColor();
   }
