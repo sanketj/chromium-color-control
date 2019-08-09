@@ -60,6 +60,7 @@ const ColorFormat = {
  * Color: Helper class to get color values in different color formats.
  */
 class Color {
+
   /**
    * @param {string|!ColorFormat} colorStringOrFormat
    * @param  {...number} colorValues ignored if colorStringOrFormat is a string
@@ -523,16 +524,21 @@ class VisualColorPicker extends HTMLElement {
     this.colorWell_ = new ColorWell(initialColor);
     this.prepend(this.colorWell_);
 
-    this.addEventListener('hue-slider-update', this.onHueSliderUpdate_);
-    this.addEventListener('visual-color-change', this.onVisualColorChange_);
-    this.colorWell_.addEventListener('mousedown', this.onColorWellMouseDown_);
-    this.hueSlider_.addEventListener('mousedown', this.onHueSliderMouseDown_);
-    this.colorWell_
-        .addEventListener('mousedown', (event) => event.preventDefault());
-    this.hueSlider_
-        .addEventListener('mousedown', (event) => event.preventDefault());
-    document.documentElement.addEventListener('mousemove', this.onMouseMove_);
-    document.documentElement.addEventListener('mouseup', this.onMouseUp_);
+    window.addEventListener('load', () => {
+      this.addEventListener('hue-slider-update', this.onHueSliderUpdate_);
+      this.addEventListener('visual-color-change', this.onVisualColorChange_);
+      this.colorWell_
+          .addEventListener('mousedown', this.onColorWellMouseDown_);
+      this.hueSlider_
+          .addEventListener('mousedown', this.onHueSliderMouseDown_);
+      this.colorWell_
+          .addEventListener('mousedown', (event) => event.preventDefault());
+      this.hueSlider_
+          .addEventListener('mousedown', (event) => event.preventDefault());
+      document.documentElement
+          .addEventListener('mousemove', this.onMouseMove_);
+      document.documentElement.addEventListener('mouseup', this.onMouseUp_);
+    });
   }
 
   onHueSliderUpdate_ = () => {
@@ -949,20 +955,8 @@ class ColorWell extends ColorSelectionArea {
 
     this.fillColor_ = new Color(ColorFormat.HSL, initialColor.hValue, 100, 50);
     this.selectedColor_ = initialColor;
-    this.initialized_ = false;
 
     window.addEventListener('load', () => {
-      this.initialize_();
-
-      this.colorSelectionRing_.addEventListener('color-selection-ring-update',
-          this.onColorSelectionRingUpdate_);
-
-      this.moveColorSelectionRingTo_(this.selectedColor_);
-    });
-  }
-
-  initialize_() {
-    if (!this.initialized_) {
       let whiteGradient = this.colorPalette_.renderingContext
           .createLinearGradient(0, 0, this.colorPalette_.offsetWidth, 0);
       whiteGradient.addColorStop(0.01, 'hsla(0, 0%, 100%, 1)');
@@ -973,10 +967,14 @@ class ColorWell extends ColorSelectionArea {
       blackGradient.addColorStop(0.99, 'hsla(0, 0%, 0%, 0)');
       this.colorPalette_.initialize(this.fillColor_, whiteGradient,
           blackGradient);
+      this.colorPalette_.fillHue(this.fillColor_);
       this.colorSelectionRing_.initialize();
 
-      this.initialized_ = true;
-    }
+      this.colorSelectionRing_.addEventListener('color-selection-ring-update',
+          this.onColorSelectionRingUpdate_);
+
+      this.moveColorSelectionRingTo_(this.selectedColor_);
+    });
   }
 
   /**
@@ -1033,10 +1031,11 @@ class ColorWell extends ColorSelectionArea {
    * @param {!Color} color
    */
   set fillColor(color) {
-    this.fillColor_ = color;
-    this.initialize_();
-    this.colorPalette_.fillHue(color);
-    this.colorSelectionRing_.updateColor();
+    if (!this.fillColor_.equals(color)) {
+      this.fillColor_ = color;
+      this.colorPalette_.fillHue(color);
+      this.colorSelectionRing_.updateColor();
+    }
   }
 
   onColorSelectionRingUpdate_ = () => {
