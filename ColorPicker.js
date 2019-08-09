@@ -357,6 +357,9 @@ class Color {
   }
 }
 
+/**
+ * Point: Helper class to get/set coordinates for two dimensional points.
+ */
 class Point {
   /**
    * @param {number} x
