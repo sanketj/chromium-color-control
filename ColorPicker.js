@@ -522,7 +522,7 @@ class VisualColorPicker extends HTMLElement {
     this.colorWell_ = new ColorWell(initialColor);
     this.prepend(this.colorWell_);
 
-    window.addEventListener('load', () => {
+    this.resizeObserver_ = new ResizeObserver(() => {
       this.addEventListener('hue-slider-update', this.onHueSliderUpdate_);
       this.addEventListener('visual-color-change', this.onVisualColorChange_);
       this.colorWell_
@@ -536,7 +536,11 @@ class VisualColorPicker extends HTMLElement {
       document.documentElement
           .addEventListener('mousemove', this.onMouseMove_);
       document.documentElement.addEventListener('mouseup', this.onMouseUp_);
+
+      this.resizeObserver_.disconnect();
+      this.resizeObserver_ = null;
     });
+    this.resizeObserver_.observe(this);
   }
 
   onHueSliderUpdate_ = () => {
@@ -972,7 +976,7 @@ class ColorWell extends ColorSelectionArea {
     this.fillColor_ = new Color(ColorFormat.HSL, initialColor.hValue, 100, 50);
     this.selectedColor_ = initialColor;
 
-    window.addEventListener('load', () => {
+    this.resizeObserver_ = new ResizeObserver(() => {
       let whiteGradient = this.colorPalette_.renderingContext
           .createLinearGradient(0, 0, this.colorPalette_.offsetWidth, 0);
       whiteGradient.addColorStop(0.01, 'hsla(0, 0%, 100%, 1)');
@@ -989,7 +993,11 @@ class ColorWell extends ColorSelectionArea {
           this.onColorSelectionRingUpdate_);
 
       this.moveColorSelectionRingTo_(this.selectedColor_);
+
+      this.resizeObserver_.disconnect();
+      this.resizeObserver_ = null;
     });
+    this.resizeObserver_.observe(this);
   }
 
   /**
@@ -1077,7 +1085,7 @@ class HueSlider extends ColorSelectionArea {
 
     this.color_ = new Color(ColorFormat.HSL, initialColor.hValue, 100, 50);
 
-    window.addEventListener('load', () => {
+    this.resizeObserver_ = new ResizeObserver(() => {
       let hueSliderPaletteGradient = this.colorPalette_.renderingContext
           .createLinearGradient(0, 0, this.colorPalette_.offsetWidth, 0);
       hueSliderPaletteGradient.addColorStop(0.01, 'hsl(0, 100%, 50%)');
@@ -1094,7 +1102,11 @@ class HueSlider extends ColorSelectionArea {
           this.onColorSelectionRingUpdate_);
 
       this.moveColorSelectionRingTo_(this.color_);
+
+      this.resizeObserver_.disconnect();
+      this.resizeObserver_ = null;
     });
+    this.resizeObserver_.observe(this);
   }
 
   /**
