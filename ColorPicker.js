@@ -629,6 +629,10 @@ class ColorViewer extends HTMLElement {
 }
 window.customElements.define('color-viewer', ColorViewer);
 
+/**
+ * ColorSelectionArea: Base class for ColorWell and HueSlider that encapsulates
+ *                     a ColorPalette and a ColorSelectionRing.
+ */
 class ColorSelectionArea extends HTMLElement {
   constructor() {
     super();
@@ -661,6 +665,9 @@ class ColorSelectionArea extends HTMLElement {
 }
 window.customElements.define('color-selection-area', ColorSelectionArea);
 
+/**
+ * ColorPalette: Displays a range of colors.
+ */
 class ColorPalette extends HTMLCanvasElement {
   constructor() {
     super();
@@ -823,6 +830,10 @@ window.customElements.define('color-palette',
                              ColorPalette,
                              { extends: 'canvas' });
 
+/**
+ * ColorSelectionRing: Provides movement and color selection functionality to
+ *                     pick colors from a given ColorPalette.
+ */
 class ColorSelectionRing extends HTMLElement {
   /**
    * @param {!ColorPalette} backingColorPalette
@@ -951,6 +962,10 @@ class ColorSelectionRing extends HTMLElement {
 }
 window.customElements.define('color-selection-ring', ColorSelectionRing);
 
+/**
+ * ColorWell: Allows selection from a range of colors, between black and white,
+ *            that have the same hue value.
+ */
 class ColorWell extends ColorSelectionArea {
   /**
    * @param {!Color} initialColor
@@ -1054,6 +1069,9 @@ class ColorWell extends ColorSelectionArea {
 }
 window.customElements.define('color-well', ColorWell);
 
+/**
+ * HueSlider: Allows selection from a range of colors with distinct hue values.
+ */
 class HueSlider extends ColorSelectionArea {
   /**
    * @param {!Color} initialColor
