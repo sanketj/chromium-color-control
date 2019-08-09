@@ -347,36 +347,11 @@ class Color {
 
 class Point {
   /**
-   * @param {number|!Point} xOrPoint
+   * @param {number} x
    * @param {number} y
    */
-  constructor(xOrPoint, y) {
-    if (xOrPoint instanceof Point) {
-      this.moveTo(xOrPoint);
-    } else {
-      this.set(xOrPoint, y);
-    }
-  }
-
-  /**
-   * @param {number} shiftFactor
-   */
-  shiftX(shiftFactor) {
-    this.x_ += shiftFactor;
-  }
-
-  /**
-   * @param {number} shiftFactor
-   */
-  shiftY(shiftFactor) {
-    this.y_ += shiftFactor;
-  }
-
-  /**
-   * @param {!Point} other
-   */
-  moveTo(other) {
-    this.set(other.x, other.y);
+  constructor(x, y) {
+    this.set(x, y);
   }
 
   /**
@@ -462,7 +437,7 @@ class ColorPicker extends HTMLElement {
    */
   onManualColorChange_ = (event) => {
     const newColor = event.detail.color;
-    if (!this.selectedColor.equals(newColor)) {
+    if (!this.selectedColor_.equals(newColor)) {
       this.selectedColor = newColor;
 
       // There may not be an exact match for newColor in the color well, in
@@ -487,10 +462,12 @@ class ColorPicker extends HTMLElement {
     const newColor = event.detail.color;
     if (!this.selectedColor.equals(newColor)) {
       if (!this.processingManualColorChange_) {
+        this.selectedColor = newColor;
         this.manualColorPicker_.color = newColor;
       } else {
         // We are in the process of making a visual color update in response to
-        // a manual color change. So we do not re-set the manual color values.
+        // a manual color change. So we do not re-set the manually selected
+        // color.
       }
     }
   }
@@ -524,22 +501,16 @@ class VisualColorPicker extends HTMLElement {
 
     let visualColorPickerStrip = document.createElement('span');
     visualColorPickerStrip.setAttribute('id', 'visual-color-picker-strip');
-    this.append(visualColorPickerStrip);
-
     this.eyeDropper_ = new EyeDropper();
     this.colorSwatch_ = new ColorSwatch(initialColor);
-    this.hueSlider_ = new HueSlider();
+    this.hueSlider_ = new HueSlider(initialColor);
     visualColorPickerStrip.append(this.eyeDropper_,
                                   this.colorSwatch_,
                                   this.hueSlider_);
+    this.append(visualColorPickerStrip);
 
     this.colorWell_ = new ColorWell(initialColor);
     this.prepend(this.colorWell_);
-
-    window.addEventListener('load', () => {
-      this.hueSlider_.selectedColor = initialColor;
-      this.colorWell_.selectedColor = initialColor;
-    });
 
     this.addEventListener('hue-slider-update', this.onHueSliderUpdate_);
     this.addEventListener('visual-color-change', this.onVisualColorChange_);
@@ -554,15 +525,14 @@ class VisualColorPicker extends HTMLElement {
   }
 
   onHueSliderUpdate_ = () => {
-    this.colorWell_.fillColor = this.hueSlider_.selectedColor;
+    this.colorWell_.fillColor = this.hueSlider_.color;
   }
 
   /**
    * @param {!Event} event
    */
   onVisualColorChange_ = (event) => {
-    const newColor = event.detail.color;
-    this.colorSwatch_.color = newColor;
+    this.colorSwatch_.color = event.detail.color;
   }
 
   /**
@@ -597,8 +567,8 @@ class VisualColorPicker extends HTMLElement {
    * @param {!Color} newColor
    */
   set color(newColor) {
-    this.hueSlider_.moveColorSelectorRingTo(newColor);
-    this.colorWell_.moveColorSelectorRingTo(newColor);
+    this.hueSlider_.color = newColor;
+    this.colorWell_.selectedColor = newColor;
   }
 }
 window.customElements.define('visual-color-picker', VisualColorPicker);
@@ -637,89 +607,61 @@ class ColorSwatch extends HTMLElement {
 window.customElements.define('color-swatch', ColorSwatch);
 
 class ColorSelectionArea extends HTMLElement {
-  /**
-   * @param {!Color} initialColor
-   * @param {string} id
-   */
-  constructor(initialColor, id) {
+  constructor() {
     super();
 
-    this.setAttribute('id', id);
-    this.colorPalette_ = new ColorPalette(initialColor, id + '-palette');
-    this.append(this.colorPalette_);
-    this.colorSelectorRing_ =
-        new ColorSelectorRing(id + '-ring', this.colorPalette_);
-    this.append(this.colorSelectorRing_);
-  }
-
-  initialize() {
-    this.colorPalette_.initialize();
-    this.colorSelectorRing_.initialize();
+    this.colorPalette_ = new ColorPalette();
+    this.colorSelectionRing_ = new ColorSelectionRing(this.colorPalette_);
+    this.append(this.colorPalette_, this.colorSelectionRing_);
   }
 
   /**
    * @param {!Point} point
    */
   mouseDown(point) {
-    this.colorSelectorRing_.setDrag();
-    this.moveColorSelectorRingTo(point);
+    this.colorSelectionRing_.setDrag();
+    this.moveColorSelectionRingTo_(point);
   }
 
   /**
    * @param {!Point} point
    */
   mouseMove(point) {
-    if (this.colorSelectorRing_.isBeingDragged) {
-      this.moveColorSelectorRingTo(point);
+    if (this.colorSelectionRing_.isBeingDragged) {
+      this.moveColorSelectionRingTo_(point);
     }
   }
 
   mouseUp() {
-    this.colorSelectorRing_.clearDrag();
+    this.colorSelectionRing_.clearDrag();
   }
 }
 window.customElements.define('color-selection-area', ColorSelectionArea);
 
 class ColorPalette extends HTMLCanvasElement {
-  /**
-   * @param {!Color} initialColor
-   * @param {string} id
-   */
-  constructor(initialColor, id) {
+  constructor() {
     super();
 
-    this.setAttribute('id', id);
     this.gradients_ = [];
-    this.fillColor = initialColor;
   }
 
-  initialize() {
+  /**
+   * @param {!Color} color
+   */
+  initialize(color) {
     this.width = this.offsetWidth;
     this.height = this.offsetHeight;
     this.renderingContext.rect(0, 0, this.width, this.height);
-    this.fillColorAndGradients_();
-  }
-
-  get rgbImageData() {
-    if (this.pendingRGBImageDataUpdate_) {
-      const rgbaImageData = this.renderingContext
-          .getImageData(0, 0, this.width, this.height).data;
-      this.rgbImageData_ = rgbaImageData
-          .reduce((rgbArray, {}, currentIndex, rgbaArray) => {
-            if ((currentIndex % 4) === 0) {
-              rgbArray.push(rgbaArray[currentIndex],
-                            rgbaArray[currentIndex + 1],
-                            rgbaArray[currentIndex + 2]);
-            }
-            return rgbArray;
-          }, []);
-      this.pendingRGBImageDataUpdate_ = false;
-    }
-    return this.rgbImageData_;
+    this.fillColor = color;
   }
 
   get hslImageData() {
-    if (this.pendingHSLImageDataUpdate_) {
+    this.initializeHSLImageData_();
+    return this.hslImageData_;
+  }
+
+  initializeHSLImageData_() {
+    if (this.pendingColorChange_) {
       const rgbaImageData = this.renderingContext
           .getImageData(0, 0, this.width, this.height).data;
       this.hslImageData_ = rgbaImageData
@@ -732,19 +674,37 @@ class ColorPalette extends HTMLCanvasElement {
           }
           return hslArray;
         }, []);
-      this.pendingHSLImageDataUpdate_ = false;
+      this.pendingColorChange_ = false;
     }
-    return this.hslImageData_;
+    if (this.pendingHueChange_) {
+      const hValueToSet = this.fillColor.hValue;
+      this.hslImageData_.forEach((hslValue, currentIndex, hslArray) => {
+        if ((currentIndex % 3) === 0 && hslValue != 0) {
+          hslArray[currentIndex] = hValueToSet;
+        }
+      });
+
+      this.pendingHueChange_ = false;
+    }
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
+  hslImageDataAtPosition_(x, y) {
+    const offset = Math.round(y * this.width + x) * 3;
+    return this.hslImageData.slice(offset, offset + 3);
   }
 
   /**
    * @param {!Point} point
    */
   colorAtPoint(point) {
-    const rgbaImageDataAtPoint = this.renderingContext
-        .getImageData(point.x - this.left, point.y - this.top, 1, 1).data;
-    return new Color(ColorFormat.RGB, rgbaImageDataAtPoint[0],
-        rgbaImageDataAtPoint[1], rgbaImageDataAtPoint[2]);
+    const hslImageDataAtPoint =
+        this.hslImageDataAtPosition_(point.x - this.left, point.y - this.top);
+    return new Color(ColorFormat.HSL, hslImageDataAtPoint[0],
+        hslImageDataAtPoint[1], hslImageDataAtPoint[2]);
   }
 
   get renderingContext() {
@@ -761,6 +721,15 @@ class ColorPalette extends HTMLCanvasElement {
   set fillColor(color) {
     this.fillColor_ = color;
     this.fillColorAndGradients_();
+    this.pendingColorChange_ = true;
+  }
+
+  /**
+   * @param {!Color} color
+   */
+  fillHue(color) {
+    this.fillColor = new Color(ColorFormat.HSL, color.hValue, 100, 50);
+    this.pendingHueChange_ = true;
   }
 
   fillColorAndGradients_() {
@@ -783,8 +752,6 @@ class ColorPalette extends HTMLCanvasElement {
     let colorPaletteCtx = this.renderingContext;
     colorPaletteCtx.fillStyle = fillStyle;
     colorPaletteCtx.fill();
-    this.pendingHSLImageDataUpdate_ = true;
-    this.pendingRGBImageDataUpdate_ = true;
   }
 
   /**
@@ -842,15 +809,13 @@ window.customElements.define('color-palette',
                              ColorPalette,
                              { extends: 'canvas' });
 
-class ColorSelectorRing extends HTMLElement {
+class ColorSelectionRing extends HTMLElement {
   /**
-   * @param {string} id
    * @param {!ColorPalette} backingColorPalette
    */
-  constructor(id, backingColorPalette) {
+  constructor(backingColorPalette) {
     super();
 
-    this.setAttribute('id', id);
     this.backingColorPalette_ = backingColorPalette;
     this.position_ = new Point(0, 0);
     this.isBeingDragged_ = false;
@@ -909,27 +874,10 @@ class ColorSelectorRing extends HTMLElement {
   }
 
   /**
-   * @param {number} y
-   */
-  setY(y) {
-    if (y !== this.position_.y) {
-      this.position_.y = y;
-      this.onPositionChange_();
-    }
-  }
-
-  /**
    * @param {number} shiftFactor
    */
   shiftX(shiftFactor) {
     this.setX(this.position_.x + shiftFactor);
-  }
-
-  /**
-   * @param {number} shiftFactor
-   */
-  shiftY(shiftFactor) {
-    this.setY(this.position_.y + shiftFactor);
   }
 
   onPositionChange_() {
@@ -965,7 +913,7 @@ class ColorSelectorRing extends HTMLElement {
 
   refreshColor() {
     this.color = this.backingColorPalette_.colorAtPoint(this.position_);
-    this.dispatchEvent(new CustomEvent('color-selector-ring-update'));
+    this.dispatchEvent(new CustomEvent('color-selection-ring-update'));
   }
 
   get radius() {
@@ -996,100 +944,114 @@ class ColorSelectorRing extends HTMLElement {
     return this.position_.y + this.height;
   }
 }
-window.customElements.define('color-selector-ring', ColorSelectorRing);
+window.customElements.define('color-selection-ring', ColorSelectionRing);
 
 class ColorWell extends ColorSelectionArea {
   /**
    * @param {!Color} initialColor
    */
   constructor(initialColor) {
-    super(initialColor, 'color-well');
+    super();
+
+    this.fillColor_ = new Color(ColorFormat.HSL, initialColor.hValue, 100, 50);
+    this.selectedColor_ = initialColor;
+    this.initialized_ = false;
 
     window.addEventListener('load', () => {
+      this.initialize();
+
+      this.colorSelectionRing_.addEventListener('color-selection-ring-update',
+          this.onColorSelectionRingUpdate_);
+
+      this.moveColorSelectionRingTo_(this.selectedColor_);
+    });
+  }
+
+  initialize() {
+    if (!this.initialized_) {
       let whiteGradient = this.colorPalette_.renderingContext
-          .createLinearGradient(0, 0,
-            this.colorPalette_.offsetWidth, 0);
+          .createLinearGradient(0, 0, this.colorPalette_.offsetWidth, 0);
       whiteGradient.addColorStop(0.01, 'hsla(0, 0%, 100%, 1)');
       whiteGradient.addColorStop(0.99, 'hsla(0, 0%, 100%, 0)');
       let blackGradient = this.colorPalette_.renderingContext
-          .createLinearGradient(0,
-            this.colorPalette_.offsetHeight, 0, 0);
+          .createLinearGradient(0, this.colorPalette_.offsetHeight, 0, 0);
       blackGradient.addColorStop(0.01, 'hsla(0, 0%, 0%, 1)');
       blackGradient.addColorStop(0.99, 'hsla(0, 0%, 0%, 0)');
       this.colorPalette_.addGradients(whiteGradient, blackGradient);
 
-      this.initialize();
-    });
+      this.colorPalette_.initialize(this.fillColor_);
+      this.colorSelectionRing_.initialize();
 
-    this.colorSelectorRing_.addEventListener('color-selector-ring-update',
-        this.onColorSelectorRingUpdate_);
+      this.initialized_ = true;
+    }
   }
 
   /**
    * @param {!Point|!Color} newPositionOrColor
    */
-  moveColorSelectorRingTo(newPositionOrColor) {
+  moveColorSelectionRingTo_(newPositionOrColor) {
     if (newPositionOrColor instanceof Point) {
       const point =
           this.colorPalette_.nearestPointOnColorPalette(newPositionOrColor);
-      this.colorSelectorRing_.moveTo(point);
+      this.colorSelectionRing_.moveTo(point);
     } else {
-      function rgbValueDistance(rgbTripleA, rgbTripleB) {
-        return Math.sqrt(Math.pow(rgbTripleB[0] - rgbTripleA[0], 2)
-            + Math.pow(rgbTripleB[1] - rgbTripleA[1], 2)
-            + Math.pow(rgbTripleB[2] - rgbTripleA[2], 2));
+      function hslValueDistance(hslTripleA, hslTripleB) {
+        return Math.sqrt(Math.pow(hslTripleB[0] - hslTripleA[0], 2)
+            + Math.pow(hslTripleB[1] - hslTripleA[1], 2)
+            + Math.pow(hslTripleB[2] - hslTripleA[2], 2));
       }
 
-      const closestRValueIndex = this.colorPalette_.rgbImageData
+      const closestHSLValueIndex = this.colorPalette_.hslImageData
           .reduce((closestSoFar, {}, index, array) => {
             if ((index % 3) === 0) {
-              const currentRGBValueDistance = rgbValueDistance([array[index],
+              const currentHSLValueDistance = hslValueDistance([array[index],
                 array[index + 1], array[index + 2]],
-                  newPositionOrColor.rgbValues());
-              const closestRGBValueDistance =
-                rgbValueDistance([array[closestSoFar], array[closestSoFar + 1],
-                  array[closestSoFar + 2]], newPositionOrColor.rgbValues());
-              if (currentRGBValueDistance < closestRGBValueDistance) {
+                  newPositionOrColor.hslValues());
+              const closestHSLValueDistance =
+                hslValueDistance([array[closestSoFar], array[closestSoFar + 1],
+                  array[closestSoFar + 2]], newPositionOrColor.hslValues());
+              if (currentHSLValueDistance < closestHSLValueDistance) {
                 return index;
               }
             }
             return closestSoFar;
           }, 0);
-      const offsetX =
-          Math.floor((closestRValueIndex / 3) % this.colorPalette_.width);
+      const offsetX = (closestHSLValueIndex / 3) % this.colorPalette_.width;
       const offsetY =
-          Math.floor((closestRValueIndex / 3) / this.colorPalette_.width);
-      this.colorSelectorRing_.set(this.colorPalette_.left + offsetX,
+          Math.floor((closestHSLValueIndex / 3) / this.colorPalette_.width);
+      this.colorSelectionRing_.set(this.colorPalette_.left + offsetX,
                                   this.colorPalette_.top + offsetY);
     }
   }
 
   get selectedColor() {
-    return this.colorSelectorRing_.color;
+    return this.selectedColor_;
   }
 
   /**
-   * @param {!Color} color
+   * @param {!Color} newColor
    */
-  set selectedColor(color) {
-    this.moveColorSelectorRingTo(color);
+  set selectedColor(newColor) {
+    this.selectedColor_ = newColor;
+    this.moveColorSelectionRingTo_(newColor);
   }
 
   get fillColor() {
-    return this.colorPalette_.fillColor;
+    return this.fillColor_;
   }
 
   /**
    * @param {!Color} color
    */
   set fillColor(color) {
-    if (!this.colorPalette_.fillColor.equals(color)) {
-      this.colorPalette_.fillColor = color;
-      this.colorSelectorRing_.refreshColor();
-    }
+    this.fillColor_ = color;
+    this.initialize();
+    this.colorPalette_.fillHue(color);
+    this.colorSelectionRing_.refreshColor();
   }
 
-  onColorSelectorRingUpdate_ = () => {
+  onColorSelectionRingUpdate_ = () => {
+    this.selectedColor_ = this.colorSelectionRing_.color;
     this.dispatchEvent(new CustomEvent('visual-color-change', {
       bubbles: true,
       detail: {
@@ -1101,8 +1063,13 @@ class ColorWell extends ColorSelectionArea {
 window.customElements.define('color-well', ColorWell);
 
 class HueSlider extends ColorSelectionArea {
-  constructor() {
-    super(/*initialColor*/new Color('hsl(0, 100%, 50%)'), 'hue-slider');
+  /**
+   * @param {!Color} initialColor
+   */
+  constructor(initialColor) {
+    super();
+
+    this.color_ = new Color(ColorFormat.HSL, initialColor.hValue, 100, 50);
 
     window.addEventListener('load', () => {
       let hueSliderPaletteGradient = this.colorPalette_.renderingContext
@@ -1116,23 +1083,27 @@ class HueSlider extends ColorSelectionArea {
       hueSliderPaletteGradient.addColorStop(0.99, 'hsl(0, 100%, 50%)');
       this.colorPalette_.addGradients(hueSliderPaletteGradient);
 
-      this.initialize();
-    });
+      this.colorPalette_.initialize(new Color('hsl(0, 100%, 50%)'));
+      this.colorSelectionRing_.initialize();
 
-    this.colorSelectorRing_.addEventListener('color-selector-ring-update',
-        this.onColorSelectorRingUpdate_);
+      this.colorSelectionRing_.addEventListener('color-selection-ring-update',
+          this.onColorSelectionRingUpdate_);
+
+      this.moveColorSelectionRingTo_(this.color_);
+    });
   }
 
   /**
    * @param {!Point|!Color} newPositionOrColor
    */
-  moveColorSelectorRingTo(newPositionOrColor) {
+  moveColorSelectionRingTo_(newPositionOrColor) {
     if (newPositionOrColor instanceof Point) {
       const point =
           this.colorPalette_.nearestPointOnColorPalette(newPositionOrColor);
-      this.colorSelectorRing_.shiftX(point.x - this.colorSelectorRing_.left);
+      this.colorSelectionRing_.shiftX(point.x - this.colorSelectionRing_.left);
     } else {
-      if (!newPositionOrColor.equals(this.colorSelectorRing_.color)) {
+      if (newPositionOrColor.hValue
+          !== this.colorSelectionRing_.color.hValue) {
         const targetHValue = newPositionOrColor.hValue;
         const closestHValueIndex = this.colorPalette_.hslImageData
             .reduce((closestHValueIndexSoFar, currentHValue, index, array) => {
@@ -1144,23 +1115,25 @@ class HueSlider extends ColorSelectionArea {
               return closestHValueIndexSoFar;
         }, 0);
         const offsetX = (closestHValueIndex / 3) % this.colorPalette_.width;
-        this.colorSelectorRing_.setX(this.colorPalette_.left + offsetX);
+        this.colorSelectionRing_.setX(this.colorPalette_.left + offsetX);
       }
     }
   }
 
-  get selectedColor() {
-    return this.colorSelectorRing_.color;
+  get color() {
+    return this.color_;
   }
 
   /**
-   * @param {!Color} color
+   * @param {!Color} newColor
    */
-  set selectedColor(color) {
-    this.moveColorSelectorRingTo(color);
+  set color(newColor) {
+    this.color_ = new Color(ColorFormat.HSL, newColor.hValue, 100, 50);
+    this.moveColorSelectionRingTo_(this.color_);
   }
 
-  onColorSelectorRingUpdate_ = () => {
+  onColorSelectionRingUpdate_ = () => {
+    this.color_ = this.colorSelectionRing_.color;
     this.dispatchEvent(new CustomEvent('hue-slider-update', {
       bubbles: true
     }));
