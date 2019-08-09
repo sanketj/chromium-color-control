@@ -501,8 +501,6 @@ window.customElements.define('color-picker', ColorPicker);
 /**
  * VisualColorPicker: Provides functionality to see the selected color and
  *                    select a different color visually.
- * TODO(crbug.com/983311): Allow colors to be selected from within the visual
- *                         color picker.
  */
 class VisualColorPicker extends HTMLElement {
   /**
