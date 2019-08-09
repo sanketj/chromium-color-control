@@ -725,7 +725,7 @@ class ColorPalette extends HTMLCanvasElement {
    * @param {!Color} color
    */
   fillHue(color) {
-    this.fillColor = new Color(ColorFormat.HSL, color.hValue, 100, 50);
+    this.fillColor_ = new Color(ColorFormat.HSL, color.hValue, 100, 50);
     this.fillColorAndGradients_();
     this.pendingHueChange_ = true;
   }
