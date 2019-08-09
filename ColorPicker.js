@@ -515,10 +515,10 @@ class VisualColorPicker extends HTMLElement {
     let visualColorPickerStrip = document.createElement('span');
     visualColorPickerStrip.setAttribute('id', 'visual-color-picker-strip');
     this.eyeDropper_ = new EyeDropper();
-    this.colorSwatch_ = new ColorSwatch(initialColor);
+    this.colorViewer_ = new ColorViewer(initialColor);
     this.hueSlider_ = new HueSlider(initialColor);
     visualColorPickerStrip.append(this.eyeDropper_,
-                                  this.colorSwatch_,
+                                  this.colorViewer_,
                                   this.hueSlider_);
     this.append(visualColorPickerStrip);
 
@@ -550,7 +550,7 @@ class VisualColorPicker extends HTMLElement {
    * @param {!Event} event
    */
   onVisualColorChange_ = (event) => {
-    this.colorSwatch_.color = event.detail.color;
+    this.colorViewer_.color = event.detail.color;
   }
 
   /**
@@ -600,7 +600,10 @@ window.customElements.define('visual-color-picker', VisualColorPicker);
 class EyeDropper extends HTMLElement { }
 window.customElements.define('eye-dropper', EyeDropper);
 
-class ColorSwatch extends HTMLElement {
+/**
+ * ColorViewer: Provides a view of the selected color.
+ */
+class ColorViewer extends HTMLElement {
   /**
    * @param {!Color} initialColor
    */
@@ -624,7 +627,7 @@ class ColorSwatch extends HTMLElement {
     }
   }
 }
-window.customElements.define('color-swatch', ColorSwatch);
+window.customElements.define('color-viewer', ColorViewer);
 
 class ColorSelectionArea extends HTMLElement {
   constructor() {
