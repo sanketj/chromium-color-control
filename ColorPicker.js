@@ -656,11 +656,6 @@ class ColorPalette extends HTMLCanvasElement {
   }
 
   get hslImageData() {
-    this.initializeHSLImageData_();
-    return this.hslImageData_;
-  }
-
-  initializeHSLImageData_() {
     if (this.pendingColorChange_) {
       const rgbaImageData = this.renderingContext
           .getImageData(0, 0, this.width, this.height).data;
@@ -686,6 +681,8 @@ class ColorPalette extends HTMLCanvasElement {
 
       this.pendingHueChange_ = false;
     }
+
+    return this.hslImageData_;
   }
 
   /**
@@ -729,6 +726,7 @@ class ColorPalette extends HTMLCanvasElement {
    */
   fillHue(color) {
     this.fillColor = new Color(ColorFormat.HSL, color.hValue, 100, 50);
+    this.fillColorAndGradients_();
     this.pendingHueChange_ = true;
   }
 
