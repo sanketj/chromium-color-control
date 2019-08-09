@@ -590,7 +590,7 @@ window.customElements.define('visual-color-picker', VisualColorPicker);
 
 /**
  * EyeDropper: Allows color selection from content outside the color picker.
- *             (This is currently just a placeholder (for sizing) for a future
+ *             (This is currently just a placeholder for a future
  *             implementation.)
  * TODO(http://crbug.com/992297): Implement eye dropper
  */
