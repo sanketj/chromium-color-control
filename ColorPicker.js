@@ -647,11 +647,13 @@ class ColorPalette extends HTMLCanvasElement {
 
   /**
    * @param {!Color} color
+   * @param {...CanvasGradient} gradients
    */
-  initialize(color) {
+  initialize(color, ...gradients) {
     this.width = this.offsetWidth;
     this.height = this.offsetHeight;
     this.renderingContext.rect(0, 0, this.width, this.height);
+    this.gradients_.push(...gradients);
     this.fillColor = color;
   }
 
@@ -660,15 +662,15 @@ class ColorPalette extends HTMLCanvasElement {
       const rgbaImageData = this.renderingContext
           .getImageData(0, 0, this.width, this.height).data;
       this.hslImageData_ = rgbaImageData
-        .reduce((hslArray, {}, currentIndex, rgbaArray) => {
-          if ((currentIndex % 4) === 0) {
-            hslArray.push(...Color.rgbToHSL(rgbaArray[currentIndex],
-                                            rgbaArray[currentIndex + 1],
-                                            rgbaArray[currentIndex + 2])
-                          .map(Math.round));
-          }
-          return hslArray;
-        }, []);
+          .reduce((hslArray, {}, currentIndex, rgbaArray) => {
+            if ((currentIndex % 4) === 0) {
+              hslArray.push(...Color.rgbToHSL(rgbaArray[currentIndex],
+                                              rgbaArray[currentIndex + 1],
+                                              rgbaArray[currentIndex + 2])
+                            .map(Math.round));
+            }
+            return hslArray;
+          }, []);
       this.pendingColorChange_ = false;
     }
     if (this.pendingHueChange_) {
@@ -681,17 +683,7 @@ class ColorPalette extends HTMLCanvasElement {
 
       this.pendingHueChange_ = false;
     }
-
     return this.hslImageData_;
-  }
-
-  /**
-   * @param {number} x
-   * @param {number} y
-   */
-  hslImageDataAtPosition_(x, y) {
-    const offset = Math.round(y * this.width + x) * 3;
-    return this.hslImageData.slice(offset, offset + 3);
   }
 
   /**
@@ -699,9 +691,18 @@ class ColorPalette extends HTMLCanvasElement {
    */
   colorAtPoint(point) {
     const hslImageDataAtPoint =
-        this.hslImageDataAtPosition_(point.x - this.left, point.y - this.top);
+        this.hslImageDataAtPoint_(point.x - this.left, point.y - this.top);
     return new Color(ColorFormat.HSL, hslImageDataAtPoint[0],
         hslImageDataAtPoint[1], hslImageDataAtPoint[2]);
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
+  hslImageDataAtPoint_(x, y) {
+    const offset = Math.round(y * this.width + x) * 3;
+    return this.hslImageData.slice(offset, offset + 3);
   }
 
   get renderingContext() {
@@ -725,7 +726,8 @@ class ColorPalette extends HTMLCanvasElement {
    * @param {!Color} color
    */
   fillHue(color) {
-    this.fillColor_ = new Color(ColorFormat.HSL, color.hValue, 100, 50);
+    this.fillColor_ = new Color(ColorFormat.HSL, color.hValue,
+        this.fillColor_.sValue, this.fillColor_.lValue);
     this.fillColorAndGradients_();
     this.pendingHueChange_ = true;
   }
@@ -736,15 +738,7 @@ class ColorPalette extends HTMLCanvasElement {
   }
 
   /**
-   * @param {...number} gradientsToAdd
-   */
-  addGradients(...gradientsToAdd) {
-    this.gradients_.push(...gradientsToAdd);
-    gradientsToAdd.forEach((gradient) => this.fillWithStyle_(gradient));
-  }
-
-  /**
-   * @param {string|CanvasGradient} fillStyle
+   * @param {string|!CanvasGradient} fillStyle
    */
   fillWithStyle_(fillStyle) {
     let colorPaletteCtx = this.renderingContext;
@@ -975,9 +969,8 @@ class ColorWell extends ColorSelectionArea {
           .createLinearGradient(0, this.colorPalette_.offsetHeight, 0, 0);
       blackGradient.addColorStop(0.01, 'hsla(0, 0%, 0%, 1)');
       blackGradient.addColorStop(0.99, 'hsla(0, 0%, 0%, 0)');
-      this.colorPalette_.addGradients(whiteGradient, blackGradient);
-
-      this.colorPalette_.initialize(this.fillColor_);
+      this.colorPalette_.initialize(this.fillColor_, whiteGradient,
+          blackGradient);
       this.colorSelectionRing_.initialize();
 
       this.initialized_ = true;
@@ -1079,9 +1072,8 @@ class HueSlider extends ColorSelectionArea {
       hueSliderPaletteGradient.addColorStop(0.67, 'hsl(120, 100%, 50%)');
       hueSliderPaletteGradient.addColorStop(0.83, 'hsl(60, 100%, 50%)');
       hueSliderPaletteGradient.addColorStop(0.99, 'hsl(0, 100%, 50%)');
-      this.colorPalette_.addGradients(hueSliderPaletteGradient);
-
-      this.colorPalette_.initialize(new Color('hsl(0, 100%, 50%)'));
+      this.colorPalette_.initialize(new Color('hsl(0, 100%, 50%)'),
+          hueSliderPaletteGradient);
       this.colorSelectionRing_.initialize();
 
       this.colorSelectionRing_.addEventListener('color-selection-ring-update',
