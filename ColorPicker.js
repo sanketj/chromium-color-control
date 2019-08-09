@@ -1121,7 +1121,7 @@ class HueSlider extends ColorSelectionArea {
               }
               return closestHValueIndexSoFar;
         }, 0);
-        const offsetX = closestHValueIndex / 3;
+        const offsetX = (closestHValueIndex / 3) % this.colorPalette_.width;
         this.colorSelectionRing_.setX(this.colorPalette_.left + offsetX);
       }
     }
