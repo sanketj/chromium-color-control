@@ -673,8 +673,8 @@ class ColorPalette extends HTMLCanvasElement {
     }
     if (this.pendingHueChange_) {
       const hValueToSet = this.fillColor.hValue;
-      this.hslImageData_.forEach((hslValue, currentIndex, hslArray) => {
-        if ((currentIndex % 3) === 0 && hslValue != 0) {
+      this.hslImageData_.forEach(({}, currentIndex, hslArray) => {
+        if ((currentIndex % 3) === 0) {
           hslArray[currentIndex] = hValueToSet;
         }
       });
