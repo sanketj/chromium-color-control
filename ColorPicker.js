@@ -663,15 +663,14 @@ class ColorPalette extends HTMLCanvasElement {
   }
 
   /**
-   * @param {!Color} color
    * @param {...CanvasGradient} gradients
    */
-  initialize(color, ...gradients) {
+  initialize(...gradients) {
     this.width = this.offsetWidth;
     this.height = this.offsetHeight;
     this.renderingContext.rect(0, 0, this.width, this.height);
     this.gradients_.push(...gradients);
-    this.fillColor = color;
+    this.fillColor = new Color('hsl(0, 100%, 50%)');
   }
 
   get hslImageData() {
@@ -965,8 +964,7 @@ class ColorWell extends ColorSelectionArea {
           .createLinearGradient(0, this.colorPalette_.offsetHeight, 0, 0);
       blackGradient.addColorStop(0.01, 'hsla(0, 0%, 0%, 1)');
       blackGradient.addColorStop(0.99, 'hsla(0, 0%, 0%, 0)');
-      this.colorPalette_.initialize(this.fillColor_, whiteGradient,
-          blackGradient);
+      this.colorPalette_.initialize(whiteGradient, blackGradient);
       this.colorPalette_.fillHue(this.fillColor_);
       this.colorSelectionRing_.initialize();
 
@@ -1069,8 +1067,7 @@ class HueSlider extends ColorSelectionArea {
       hueSliderPaletteGradient.addColorStop(0.67, 'hsl(120, 100%, 50%)');
       hueSliderPaletteGradient.addColorStop(0.83, 'hsl(60, 100%, 50%)');
       hueSliderPaletteGradient.addColorStop(0.99, 'hsl(0, 100%, 50%)');
-      this.colorPalette_.initialize(new Color('hsl(0, 100%, 50%)'),
-          hueSliderPaletteGradient);
+      this.colorPalette_.initialize(hueSliderPaletteGradient);
       this.colorSelectionRing_.initialize();
 
       this.colorSelectionRing_.addEventListener('color-selection-ring-update',
