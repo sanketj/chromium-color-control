@@ -60,7 +60,6 @@ const ColorFormat = {
  * Color: Helper class to get color values in different color formats.
  */
 class Color {
-
   /**
    * @param {string|!ColorFormat} colorStringOrFormat
    * @param  {...number} colorValues ignored if colorStringOrFormat is a string
@@ -450,18 +449,18 @@ class ColorPicker extends HTMLElement {
    */
   onManualColorChange_ = (event) => {
     const newColor = event.detail.color;
-    if (!this.selectedColor_.equals(newColor)) {
+    if (!this.selectedColor.equals(newColor)) {
       this.selectedColor = newColor;
 
-      // There may not be an exact match for newColor in the color well, in
-      // which case we will find the closest match. When this happens though,
-      // we want the manually chosen values to remain the selected values (as
-      // they were explicitly specified by the user). Therefore, we need to
-      // prevent them from getting overwritten when onVisualColorChange_ runs.
-      // We do this by setting the processingManualColorChange_ flag here and
-      // checking for it inside onVisualColorChange_. If the flag is set, the
-      // manual color values will not be updated with the color shown in the
-      // visual color picker.
+      // There may not be an exact match for newColor in the HueSlider or
+      // ColorWell, in which case we will display the closest match. When this
+      // happens though, we want the manually chosen values to remain the
+      // selected values (as they were explicitly specified by the user).
+      // Therefore, we need to prevent them from getting overwritten when
+      // onVisualColorChange_ runs. We do this by setting the
+      // processingManualColorChange_ flag here and checking for it inside
+      // onVisualColorChange_. If the flag is set, the manual color values
+      // will not be updated with the color shown in the visual color picker.
       this.processingManualColorChange_ = true;
       this.visualColorPicker_.color = newColor;
       this.processingManualColorChange_ = false;
@@ -478,9 +477,9 @@ class ColorPicker extends HTMLElement {
         this.selectedColor = newColor;
         this.manualColorPicker_.color = newColor;
       } else {
-        // We are in the process of making a visual color update in response to
-        // a manual color change. So we do not re-set the manually selected
-        // color.
+        // We are making a visual color change in response to a manual color
+        // change. So we do not overwrite the manually specified values and do
+        // not change the selected color.
       }
     }
   }
@@ -619,7 +618,7 @@ class ColorViewer extends HTMLElement {
    * @param {!Color} color
    */
   set color(color) {
-    if (this.color_ !== color) {
+    if (this.color_ === undefined || !this.color_.equals(color)) {
       this.color_ = color;
       this.style.backgroundColor = color.asRGB();
     }
@@ -1132,8 +1131,10 @@ class HueSlider extends ColorSelectionArea {
    * @param {!Color} newColor
    */
   set color(newColor) {
-    this.color_ = new Color(ColorFormat.HSL, newColor.hValue, 100, 50);
-    this.moveColorSelectionRingTo_(this.color_);
+    if (this.color_.hValue !== newColor.hValue) {
+      this.color_ = new Color(ColorFormat.HSL, newColor.hValue, 100, 50);
+      this.moveColorSelectionRingTo_(this.color_);
+    }
   }
 
   onColorSelectionRingUpdate_ = () => {
