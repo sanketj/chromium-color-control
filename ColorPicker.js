@@ -619,7 +619,7 @@ class ColorSelectionArea extends HTMLElement {
    * @param {!Point} point
    */
   mouseDown(point) {
-    this.colorSelectionRing_.setDrag();
+    this.colorSelectionRing_.drag = true;
     this.moveColorSelectionRingTo_(point);
   }
 
@@ -627,13 +627,13 @@ class ColorSelectionArea extends HTMLElement {
    * @param {!Point} point
    */
   mouseMove(point) {
-    if (this.colorSelectionRing_.isBeingDragged) {
+    if (this.colorSelectionRing_.drag) {
       this.moveColorSelectionRingTo_(point);
     }
   }
 
   mouseUp() {
-    this.colorSelectionRing_.clearDrag();
+    this.colorSelectionRing_.drag = false;
   }
 }
 window.customElements.define('color-selection-area', ColorSelectionArea);
@@ -810,30 +810,11 @@ class ColorSelectionRing extends HTMLElement {
 
     this.backingColorPalette_ = backingColorPalette;
     this.position_ = new Point(0, 0);
-    this.isBeingDragged_ = false;
+    this.drag_ = false;
   }
 
   initialize() {
     this.set(this.backingColorPalette_.left, this.backingColorPalette_.top);
-  }
-
-  setElementPosition_() {
-    if (this.height > this.backingColorPalette_.height) {
-      this.style.top = this.top
-          - (this.height - this.backingColorPalette_.height) / 2
-          - this.backingColorPalette_.top + 'px';
-    } else {
-      this.style.top = this.top - this.radius
-          - this.backingColorPalette_.top + 'px';
-    }
-    if (this.width > this.backingColorPalette_.width) {
-      this.style.left = this.left
-          - (this.width - this.backingColorPalette_.width) / 2
-          - this.backingColorPalette_.top + 'px';
-    } else {
-      this.style.left = this.left - this.radius
-          - this.backingColorPalette_.left + 'px';
-    }
   }
 
   /**
@@ -874,19 +855,31 @@ class ColorSelectionRing extends HTMLElement {
 
   onPositionChange_() {
     this.setElementPosition_();
-    this.refreshColor();
+    this.updateColor();
   }
 
-  get isBeingDragged() {
-    return this.isBeingDragged_;
+  setElementPosition_() {
+    if (this.height > this.backingColorPalette_.height) {
+      this.style.top = this.top
+          - (this.height - this.backingColorPalette_.height) / 2
+          - this.backingColorPalette_.top + 'px';
+    } else {
+      this.style.top = this.top - this.radius
+          - this.backingColorPalette_.top + 'px';
+    }
+    if (this.width > this.backingColorPalette_.width) {
+      this.style.left = this.left
+          - (this.width - this.backingColorPalette_.width) / 2
+          - this.backingColorPalette_.top + 'px';
+    } else {
+      this.style.left = this.left - this.radius
+          - this.backingColorPalette_.left + 'px';
+    }
   }
 
-  setDrag() {
-    this.isBeingDragged_ = true;
-  }
-
-  clearDrag() {
-    this.isBeingDragged_ = false;
+  updateColor() {
+    this.color = this.backingColorPalette_.colorAtPoint(this.position_);
+    this.dispatchEvent(new CustomEvent('color-selection-ring-update'));
   }
 
   get color() {
@@ -903,9 +896,15 @@ class ColorSelectionRing extends HTMLElement {
     }
   }
 
-  refreshColor() {
-    this.color = this.backingColorPalette_.colorAtPoint(this.position_);
-    this.dispatchEvent(new CustomEvent('color-selection-ring-update'));
+  get drag() {
+    return this.drag_;
+  }
+
+  /**
+   * @param {boolean} drag
+   */
+  set drag(drag) {
+    this.drag_ = drag;
   }
 
   get radius() {
@@ -924,16 +923,8 @@ class ColorSelectionRing extends HTMLElement {
     return this.position_.x;
   }
 
-  get right() {
-    return this.position_.x + this.width;
-  }
-
   get top() {
     return this.position_.y;
-  }
-
-  get bottom() {
-    return this.position_.y + this.height;
   }
 }
 window.customElements.define('color-selection-ring', ColorSelectionRing);
@@ -1038,7 +1029,7 @@ class ColorWell extends ColorSelectionArea {
     this.fillColor_ = color;
     this.initialize();
     this.colorPalette_.fillHue(color);
-    this.colorSelectionRing_.refreshColor();
+    this.colorSelectionRing_.updateColor();
   }
 
   onColorSelectionRingUpdate_ = () => {
