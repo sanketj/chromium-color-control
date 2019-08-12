@@ -528,18 +528,16 @@ class VisualColorPicker extends HTMLElement {
     this.prepend(this.colorWell_);
 
     this.colorWell_.addEventListener('color-well-initialized', () => {
-      this.colorWell_.initialized_ = true;
       this.initializeListeners_();
     });
 
     this.hueSlider_.addEventListener('hue-slider-initialized', () => {
-      this.hueSlider_.initialized_ = true;
       this.initializeListeners_();
     });
   }
 
   initializeListeners_ = () => {
-    if (this.colorWell_.initialized_ && this.hueSlider_.initialized_) {
+    if (this.colorWell_.initialized && this.hueSlider_.initialized) {
       this.addEventListener('hue-slider-update', this.onHueSliderUpdate_);
       this.addEventListener('visual-color-change', this.onVisualColorChange_);
       this.colorWell_
@@ -656,6 +654,11 @@ class ColorSelectionArea extends HTMLElement {
     this.colorPalette_ = new ColorPalette();
     this.colorSelectionRing_ = new ColorSelectionRing(this.colorPalette_);
     this.append(this.colorPalette_, this.colorSelectionRing_);
+    this.initialized_ = false;
+  }
+
+  get initialized() {
+    return this.initialized_;
   }
 
   /**
@@ -1012,6 +1015,7 @@ class ColorWell extends ColorSelectionArea {
       this.resizeObserver_.disconnect();
       this.resizeObserver_ = null;
 
+      this.initialized_ = true;
       this.dispatchEvent(new CustomEvent('color-well-initialized'));
     });
     this.resizeObserver_.observe(this);
@@ -1123,6 +1127,7 @@ class HueSlider extends ColorSelectionArea {
       this.resizeObserver_.disconnect();
       this.resizeObserver_ = null;
 
+      this.initialized_ = true;
       this.dispatchEvent(new CustomEvent('hue-slider-initialized'));
     });
     this.resizeObserver_.observe(this);
