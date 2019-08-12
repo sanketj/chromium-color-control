@@ -49,8 +49,8 @@ eye-dropper {
 }
 
 color-viewer {
-  border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.19);
+  border-radius: 50%;
   box-sizing: border-box;
   height: 32px;
   margin-left: 2%;

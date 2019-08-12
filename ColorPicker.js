@@ -921,7 +921,7 @@ class ColorSelectionRing extends HTMLElement {
     if (this.width > this.backingColorPalette_.width) {
       this.style.left = this.left
           - (this.width - this.backingColorPalette_.width) / 2
-          - this.backingColorPalette_.top + 'px';
+          - this.backingColorPalette_.left + 'px';
     } else {
       this.style.left = this.left - this.radius
           - this.backingColorPalette_.left + 'px';
