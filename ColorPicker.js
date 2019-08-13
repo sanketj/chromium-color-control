@@ -1349,19 +1349,33 @@ class ChannelValueContainer extends HTMLInputElement {
     this.colorChannel_ = colorChannel;
     switch(colorChannel) {
       case ColorChannel.HEX:
+        this.setAttribute('id', 'hexValueContainer');
         this.setAttribute('maxlength', '7');
         break;
       case ColorChannel.R:
+        this.setAttribute('id', 'rValueContainer');
+        this.setAttribute('maxlength', '3');
+        break;
       case ColorChannel.G:
+        this.setAttribute('id', 'gValueContainer');
+        this.setAttribute('maxlength', '3');
+        break;
       case ColorChannel.B:
+        this.setAttribute('id', 'bValueContainer');
         this.setAttribute('maxlength', '3');
         break;
       case ColorChannel.H:
+        this.setAttribute('id', 'hValueContainer');
         this.setAttribute('maxlength', '3');
         break;
       case ColorChannel.S:
+        // up to 3 digits plus '%'
+        this.setAttribute('id', 'sValueContainer');
+        this.setAttribute('maxlength', '4');
+        break;
       case ColorChannel.L:
         // up to 3 digits plus '%'
+        this.setAttribute('id', 'lValueContainer');
         this.setAttribute('maxlength', '4');
         break;
     }
