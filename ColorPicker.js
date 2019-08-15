@@ -31,6 +31,18 @@
 // }
 
 /**
+ * Supported movement directions.
+ * @enum {number}
+ */
+const Direction = {
+  UNDEFINED: 0,
+  LEFT: 1,
+  RIGHT: 2,
+  UP: 3,
+  DOWN: 4,
+}
+
+/**
  * Supported color channels.
  * @enum {number}
  */
@@ -544,13 +556,12 @@ class VisualColorPicker extends HTMLElement {
           .addEventListener('mousedown', this.onColorWellMouseDown_);
       this.hueSlider_
           .addEventListener('mousedown', this.onHueSliderMouseDown_);
-      this.colorWell_
-          .addEventListener('mousedown', (event) => event.preventDefault());
-      this.hueSlider_
-          .addEventListener('mousedown', (event) => event.preventDefault());
+      document.documentElement
+          .addEventListener('mousedown', this.onMouseDown_);
       document.documentElement
           .addEventListener('mousemove', this.onMouseMove_);
       document.documentElement.addEventListener('mouseup', this.onMouseUp_);
+      document.documentElement.addEventListener('keydown', this.onKeyDown_);
 
       this.dispatchEvent(new CustomEvent('visual-color-picker-initialized'));
     }
@@ -571,7 +582,25 @@ class VisualColorPicker extends HTMLElement {
    * @param {!Event} event
    */
   onColorWellMouseDown_ = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    this.hueSlider_.focused = false;
     this.colorWell_.mouseDown(new Point(event.clientX, event.clientY));
+  }
+
+  /**
+   * @param {!Event} event
+   */
+  onHueSliderMouseDown_ = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    this.colorWell_.focused = false;
+    this.hueSlider_.mouseDown(new Point(event.clientX, event.clientY));
+  }
+
+  onMouseDown_ = () => {
+    this.colorWell_.focused = false;
+    this.hueSlider_.focused = false;
   }
 
   /**
@@ -591,8 +620,23 @@ class VisualColorPicker extends HTMLElement {
   /**
    * @param {!Event} event
    */
-  onHueSliderMouseDown_ = (event) => {
-    this.hueSlider_.mouseDown(new Point(event.clientX, event.clientY));
+  onKeyDown_ = (event) => {
+    let moveDirection = Direction.UNDEFINED;
+    if (event.key == 'ArrowUp') {
+      moveDirection = Direction.UP;
+    } else if (event.key == 'ArrowDown') {
+      moveDirection = Direction.DOWN;
+    } else if (event.key == 'ArrowLeft') {
+      moveDirection = Direction.LEFT;
+    } else if (event.key == 'ArrowRight') {
+      moveDirection = Direction.RIGHT;
+    }
+
+    if (moveDirection !== Direction.UNDEFINED) {
+      const acceleratedMove = event.ctrlKey;
+      this.hueSlider_.move(moveDirection, acceleratedMove);
+      this.colorWell_.move(moveDirection, acceleratedMove);
+    }
   }
 
   /**
@@ -665,6 +709,7 @@ class ColorSelectionArea extends HTMLElement {
    * @param {!Point} point
    */
   mouseDown(point) {
+    this.focused_ = true;
     this.colorSelectionRing_.drag = true;
     this.moveColorSelectionRingTo_(point);
   }
@@ -680,6 +725,27 @@ class ColorSelectionArea extends HTMLElement {
 
   mouseUp() {
     this.colorSelectionRing_.drag = false;
+  }
+
+  /**
+   * @param {!Direction} direction
+   * @param {bool} accelerated
+   */
+  move(direction, accelerated) {
+    if (this.focused) {
+      this.colorSelectionRing_.move(direction, accelerated);
+    }
+  }
+
+  get focused() {
+    return this.focused_;
+  }
+
+  /**
+   * @param {bool} focused
+   */
+  set focused(focused) {
+    this.focused_ = focused;
   }
 }
 window.customElements.define('color-selection-area', ColorSelectionArea);
@@ -864,6 +930,14 @@ class ColorSelectionRing extends HTMLElement {
     this.drag_ = false;
   }
 
+  static get ACCELERATED_MOVE_DISTANCE() {
+    return 20;
+  }
+
+  static get MOVE_DISTANCE() {
+    return 1;
+  }
+
   initialize() {
     this.set(this.backingColorPalette_.left, this.backingColorPalette_.top);
   }
@@ -893,6 +967,16 @@ class ColorSelectionRing extends HTMLElement {
   setX(x) {
     if (x !== this.position_.x) {
       this.position_.x = x;
+      this.onPositionChange_();
+    }
+  }
+
+  /**
+   * @param {number} x
+   */
+  setY(y) {
+    if (y !== this.position_.y) {
+      this.position_.y = y;
       this.onPositionChange_();
     }
   }
@@ -944,6 +1028,58 @@ class ColorSelectionRing extends HTMLElement {
     if (this.color_ === undefined || !this.color_.equals(color)) {
       this.color_ = color;
       this.style.backgroundColor = color.asRGB();
+    }
+  }
+
+  get canMoveHorizontally_() {
+    return this.width < this.backingColorPalette_.width;
+  }
+
+  get canMoveVertically_() {
+    return this.height < this.backingColorPalette_.height;
+  }
+
+  /**
+   * @param {!Direction} direction
+   * @param {bool} accelerated
+   */
+  move(direction, accelerated) {
+    let shiftFactor = accelerated
+        ? ColorSelectionRing.ACCELERATED_MOVE_DISTANCE
+        : ColorSelectionRing.MOVE_DISTANCE;
+    if ((direction === Direction.UP) || (direction === Direction.LEFT)) {
+      shiftFactor *= -1;
+    }
+    if (this.canMoveHorizontally_ &&
+        ((direction === Direction.LEFT) || (direction === Direction.RIGHT))) {
+      let newX = this.position_.x + shiftFactor;
+      if (direction === Direction.LEFT) {
+        if (this.position_.x + shiftFactor < this.backingColorPalette_.left) {
+          newX = this.backingColorPalette_.left;
+        }
+      } else {
+        // direction === Direction.RIGHT
+        if (this.position_.x + shiftFactor >=
+            this.backingColorPalette_.right) {
+          newX = Math.ceil(this.backingColorPalette_.right - 1);
+        }
+      }
+      this.setX(newX);
+    } else if (this.canMoveVertically_ &&
+        ((direction === Direction.UP) || (direction === Direction.DOWN))) {
+      let newY = this.position_.y + shiftFactor;
+      if (direction === Direction.UP) {
+        if (this.position_.y + shiftFactor < this.backingColorPalette_.top) {
+          newY = this.backingColorPalette_.top;
+        }
+      } else {
+        // direction === Direction.DOWN
+        if (this.position_.y + shiftFactor >=
+            this.backingColorPalette_.bottom) {
+          newY = Math.ceil(this.backingColorPalette_.bottom - 1);
+        }
+      }
+      this.setY(newY);
     }
   }
 
