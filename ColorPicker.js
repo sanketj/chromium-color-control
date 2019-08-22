@@ -868,15 +868,15 @@ class ColorPalette extends HTMLCanvasElement {
    */
   nearestPointOnColorPalette(point) {
     if (!this.isXCoordinateOnColorPalette_(point)) {
-      if (point.x >= this.right) {
-        point.x = this.right - 1;
+      if (point.x > this.right) {
+        point.x = this.right;
       } else if (point.x < this.left) {
         point.x = this.left;
       }
     }
     if (!this.isYCoordinateOnColorPalette_(point)) {
-      if (point.y >= this.bottom) {
-        point.y = this.bottom - 1;
+      if (point.y > this.bottom) {
+        point.y = this.bottom;
       } else if (point.y < this.top) {
         point.y = this.top;
       }
@@ -888,30 +888,30 @@ class ColorPalette extends HTMLCanvasElement {
    * @param {!Point} point
    */
   isXCoordinateOnColorPalette_(point) {
-    return (point.x >= this.left) && (point.x < this.right);
+    return (point.x >= this.left) && (point.x <= this.right);
   }
 
   /**
    * @param {!Point} point
    */
   isYCoordinateOnColorPalette_(point) {
-    return (point.y >= this.top) && (point.y < this.bottom);
+    return (point.y >= this.top) && (point.y <= this.bottom);
   }
 
   get left() {
-    return this.getBoundingClientRect().left;
+    return Math.ceil(this.getBoundingClientRect().left);
   }
 
   get right() {
-    return this.getBoundingClientRect().right;
+    return Math.ceil(this.getBoundingClientRect().right - 1);
   }
 
   get top() {
-    return this.getBoundingClientRect().top;
+    return Math.ceil(this.getBoundingClientRect().top);
   }
 
   get bottom() {
-    return this.getBoundingClientRect().bottom;
+    return Math.ceil(this.getBoundingClientRect().bottom - 1);
   }
 }
 window.customElements.define('color-palette',
@@ -1063,9 +1063,9 @@ class ColorSelectionRing extends HTMLElement {
         }
       } else {
         // direction === Direction.RIGHT
-        if (this.position_.x + shiftFactor >=
+        if (this.position_.x + shiftFactor >
             this.backingColorPalette_.right) {
-          newX = Math.ceil(this.backingColorPalette_.right - 1);
+          newX = this.backingColorPalette_.right;
         }
       }
       this.setX(newX);
@@ -1078,9 +1078,9 @@ class ColorSelectionRing extends HTMLElement {
         }
       } else {
         // direction === Direction.DOWN
-        if (this.position_.y + shiftFactor >=
+        if (this.position_.y + shiftFactor >
             this.backingColorPalette_.bottom) {
-          newY = Math.ceil(this.backingColorPalette_.bottom - 1);
+          newY = this.backingColorPalette_.bottom;
         }
       }
       this.setY(newY);
@@ -1103,11 +1103,11 @@ class ColorSelectionRing extends HTMLElement {
   }
 
   get width() {
-    return this.getBoundingClientRect().width;
+    return Math.floor(this.getBoundingClientRect().width);
   }
 
   get height() {
-    return this.getBoundingClientRect().height;
+    return Math.floor(this.getBoundingClientRect().height);
   }
 
   get left() {
