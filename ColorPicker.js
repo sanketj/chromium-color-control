@@ -622,16 +622,20 @@ class VisualColorPicker extends HTMLElement {
    */
   onKeyDown_ = (event) => {
     let moveDirection = Direction.UNDEFINED;
-    if (event.key == 'ArrowUp') {
-      moveDirection = Direction.UP;
-    } else if (event.key == 'ArrowDown') {
-      moveDirection = Direction.DOWN;
-    } else if (event.key == 'ArrowLeft') {
-      moveDirection = Direction.LEFT;
-    } else if (event.key == 'ArrowRight') {
-      moveDirection = Direction.RIGHT;
+    switch(event.key) {
+      case 'ArrowUp':
+        moveDirection = Direction.UP;
+        break;
+      case 'ArrowDown':
+        moveDirection = Direction.DOWN;
+        break;
+      case 'ArrowLeft':
+        moveDirection = Direction.LEFT;
+        break;
+      case 'ArrowRight':
+        moveDirection = Direction.RIGHT;
+        break;
     }
-
     if (moveDirection !== Direction.UNDEFINED) {
       const acceleratedMove = event.ctrlKey;
       this.hueSlider_.move(moveDirection, acceleratedMove);
