@@ -499,17 +499,18 @@ class ColorPicker extends HTMLElement {
     }
   }
 
-  // FIXME: Uncomment the block below when submitting to Chromium.
-  // onSubmitButtonClick_ = () => {
-  //   const selectedValue = this.selectedColor_.asHex();
-  //   window.setTimeout(function() {
-  //     window.pagePopupController.setValueAndClosePopup(0, selectedValue);
-  //   }, 100);
-  // }
+  onSubmitButtonClick_ = () => {
+    // FIXME: Uncomment the block below when submitting to Chromium.
+    // const selectedValue = this.selectedColor_.asHex();
+    // window.setTimeout(function() {
+    //   window.pagePopupController.setValueAndClosePopup(0, selectedValue);
+    // }, 100);
+  }
 
-  // onCancelButtonClick_ = () => {
-  //   window.pagePopupController.closePopup();
-  // }
+  onCancelButtonClick_ = () => {
+    // FIXME: Uncomment the block below when submitting to Chromium.
+    // window.pagePopupController.closePopup();
+  }
 }
 window.customElements.define('color-picker', ColorPicker);
 
