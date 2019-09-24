@@ -442,6 +442,8 @@ class ColorPicker extends HTMLElement {
         .addEventListener('manual-color-change', this.onManualColorChange_);
 
     this.addEventListener('visual-color-change', this.onVisualColorChange_);
+
+    document.documentElement.addEventListener('keydown', this.onKeyDown_);
   }
 
   get selectedColor() {
@@ -496,6 +498,20 @@ class ColorPicker extends HTMLElement {
         // change. So we do not overwrite the manually specified values and do
         // not change the selected color.
       }
+    }
+  }
+
+  /**
+   * @param {!Event} event
+   */
+  onKeyDown_ = (event) => {
+    switch(event.key) {
+      case 'Enter':
+        this.submissionControls_.submitButton.click();
+        break;
+      case 'Escape':
+        this.submissionControls_.cancelButton.click();
+        break;
     }
   }
 
@@ -1831,6 +1847,14 @@ class SubmissionControls extends HTMLElement {
         'fill="black"/></svg>'
     );
     this.append(this.submitButton_, this.cancelButton_);
+  }
+
+  get submitButton() {
+    return this.submitButton_;
+  }
+
+  get cancelButton() {
+    return this.cancelButton_;
   }
 }
 window.customElements.define('submission-controls', SubmissionControls);
