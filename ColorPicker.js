@@ -515,12 +515,16 @@ class ColorPicker extends HTMLElement {
     }
   }
 
+  static get COMMIT_DELAY_MS() {
+    return 100;
+  }
+
   onSubmitButtonClick_ = () => {
     // FIXME: Uncomment the block below when submitting to Chromium.
     // const selectedValue = this.selectedColor_.asHex();
     // window.setTimeout(function() {
     //   window.pagePopupController.setValueAndClosePopup(0, selectedValue);
-    // }, 100);
+    // }, ColorPicker.COMMIT_DELAY_MS);
   }
 
   onCancelButtonClick_ = () => {
