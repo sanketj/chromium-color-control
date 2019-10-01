@@ -24,7 +24,7 @@
 //  */
 // function validateColorPickerArguments(args) {
 //   if (args.shouldShowColorSuggestionPicker)
-//     return 'Should be showing the color suggestion picker.'
+//     return 'Should be showing the color suggestion picker.';
 //   if (!args.selectedColor)
 //     return 'No selectedColor.';
 //   return null;
@@ -84,15 +84,17 @@ class Color {
         colorStringOrFormat = colorStringOrFormat.replace(/\s+/g, '');
         [this.rValue_, this.gValue_, this.bValue_] =
             colorStringOrFormat.substring(4, colorStringOrFormat.length - 1)
-            .split(',').map(Number);
+                .split(',')
+                .map(Number);
       } else if (colorStringOrFormat.startsWith('hsl')) {
         colorStringOrFormat = colorStringOrFormat.replace(/%|\s+/g, '');
         [this.hValue_, this.sValue_, this.lValue_] =
             colorStringOrFormat.substring(4, colorStringOrFormat.length - 1)
-            .split(',').map(Number);
+                .split(',')
+                .map(Number);
       }
     } else {
-      switch(colorStringOrFormat) {
+      switch (colorStringOrFormat) {
         case ColorFormat.HEX:
           this.hexValue_ = colorValues[0].toLowerCase();
           break;
@@ -125,11 +127,9 @@ class Color {
     if (this.hexValue_ !== undefined) {
       // Already computed.
     } else if (this.rValue_ !== undefined) {
-      this.hexValue_ =
-          Color.rgbToHex(this.rValue_, this.gValue_, this.bValue_);
+      this.hexValue_ = Color.rgbToHex(this.rValue_, this.gValue_, this.bValue_);
     } else if (this.hValue_ !== undefined) {
-      this.hexValue_ =
-          Color.hslToHex(this.hValue_, this.sValue_, this.lValue_);
+      this.hexValue_ = Color.hslToHex(this.hValue_, this.sValue_, this.lValue_);
     }
   }
 
@@ -232,7 +232,9 @@ class Color {
   static hexToRGB(hexValue) {
     // Ex. 'ffffff' => '[255,255,255]'
     const colorValue = parseInt(hexValue, 16);
-    return [(colorValue >> 16) & 255, (colorValue >> 8) & 255, colorValue & 255];
+    return [
+      (colorValue >> 16) & 255, (colorValue >> 8) & 255, colorValue & 255
+    ];
   }
 
   /**
@@ -243,7 +245,7 @@ class Color {
     // Ex. '[255,255,255]' => 'ffffff'
     return rgbValues.reduce((cumulativeHexValue, rgbValue) => {
       let hexValue = Number(rgbValue).toString(16);
-      if(hexValue.length == 1) {
+      if (hexValue.length == 1) {
         hexValue = '0' + hexValue;
       }
       return (cumulativeHexValue + hexValue);
@@ -358,9 +360,9 @@ class Color {
    * Both color triples must be of the same color format.
    */
   static distance(colorTripleA, colorTripleB) {
-    return Math.sqrt(Math.pow(colorTripleA[0] - colorTripleB[0], 2)
-        + Math.pow(colorTripleA[1] - colorTripleB[1], 2)
-        + Math.pow(colorTripleA[2] - colorTripleB[2], 2));
+    return Math.sqrt(Math.pow(colorTripleA[0] - colorTripleB[0], 2) +
+        Math.pow(colorTripleA[1] - colorTripleB[1], 2) +
+        Math.pow(colorTripleA[2] - colorTripleB[2], 2));
   }
 }
 
@@ -426,15 +428,14 @@ class ColorPicker extends HTMLElement {
 
     this.visualColorPicker_ = new VisualColorPicker(initialColor);
     this.manualColorPicker_ = new ManualColorPicker(initialColor);
-    this.submissionControls_ =
-        new SubmissionControls(this.onSubmitButtonClick_,
-                               this.onCancelButtonClick_);
-    this.append(this.visualColorPicker_,
-                this.manualColorPicker_,
-                this.submissionControls_);
+    this.submissionControls_ = new SubmissionControls(
+        this.onSubmitButtonClick_, this.onCancelButtonClick_);
+    this.append(
+        this.visualColorPicker_, this.manualColorPicker_,
+        this.submissionControls_);
 
-    this.visualColorPicker_.addEventListener('visual-color-picker-initialized',
-        this.initializeListeners_);
+    this.visualColorPicker_.addEventListener(
+        'visual-color-picker-initialized', this.initializeListeners_);
   }
 
   initializeListeners_ = () => {
@@ -525,12 +526,12 @@ class ColorPicker extends HTMLElement {
     // window.setTimeout(function() {
     //   window.pagePopupController.setValueAndClosePopup(0, selectedValue);
     // }, ColorPicker.COMMIT_DELAY_MS);
-  }
+  };
 
   onCancelButtonClick_ = () => {
     // FIXME: Uncomment the block below when submitting to Chromium.
     // window.pagePopupController.closePopup();
-  }
+  };
 }
 window.customElements.define('color-picker', ColorPicker);
 
@@ -550,9 +551,8 @@ class VisualColorPicker extends HTMLElement {
     this.eyeDropper_ = new EyeDropper();
     this.colorViewer_ = new ColorViewer(initialColor);
     this.hueSlider_ = new HueSlider(initialColor);
-    visualColorPickerStrip.append(this.eyeDropper_,
-                                  this.colorViewer_,
-                                  this.hueSlider_);
+    visualColorPickerStrip.append(
+        this.eyeDropper_, this.colorViewer_, this.hueSlider_);
     this.append(visualColorPickerStrip);
 
     this.colorWell_ = new ColorWell(initialColor);
@@ -678,7 +678,7 @@ window.customElements.define('visual-color-picker', VisualColorPicker);
  *             implementation.)
  * TODO(http://crbug.com/992297): Implement eye dropper
  */
-class EyeDropper extends HTMLElement { }
+class EyeDropper extends HTMLElement {}
 window.customElements.define('eye-dropper', EyeDropper);
 
 /**
@@ -723,8 +723,10 @@ class ColorSelectionArea extends HTMLElement {
     this.append(this.colorPalette_, this.colorSelectionRing_);
     this.initialized_ = false;
 
-    this.colorSelectionRing_.addEventListener('focus', this.onColorSelectionRingFocus_);
-    this.colorSelectionRing_.addEventListener('blur', this.onColorSelectionRingBlur_);
+    this.colorSelectionRing_.addEventListener(
+        'focus', this.onColorSelectionRingFocus_);
+    this.colorSelectionRing_.addEventListener(
+        'blur', this.onColorSelectionRingBlur_);
   }
 
   get initialized() {
@@ -733,11 +735,11 @@ class ColorSelectionArea extends HTMLElement {
 
   onColorSelectionRingFocus_ = () => {
     this.focused_ = true;
-  }
+  };
 
   onColorSelectionRingBlur_ = () => {
     this.focused_ = false;
-  }
+  };
 
   /**
    * @param {!Point} point
@@ -807,14 +809,15 @@ class ColorPalette extends HTMLCanvasElement {
 
   get hslImageData() {
     if (this.pendingColorChange_) {
-      const rgbaImageData = this.renderingContext
-          .getImageData(0, 0, this.width, this.height).data;
-      this.hslImageData_ = rgbaImageData
-          .reduce((hslArray, {}, currentIndex, rgbaArray) => {
+      const rgbaImageData =
+          this.renderingContext.getImageData(0, 0, this.width, this.height)
+              .data;
+      this.hslImageData_ =
+          rgbaImageData.reduce((hslArray, {}, currentIndex, rgbaArray) => {
             if ((currentIndex % 4) === 0) {
-              hslArray.push(...Color.rgbToHSL(rgbaArray[currentIndex],
-                                              rgbaArray[currentIndex + 1],
-                                              rgbaArray[currentIndex + 2]));
+              hslArray.push(...Color.rgbToHSL(
+                  rgbaArray[currentIndex], rgbaArray[currentIndex + 1],
+                  rgbaArray[currentIndex + 2]));
             }
             return hslArray;
           }, []);
@@ -839,8 +842,9 @@ class ColorPalette extends HTMLCanvasElement {
   colorAtPoint(point) {
     const hslImageDataAtPoint =
         this.hslImageDataAtPoint_(point.x - this.left, point.y - this.top);
-    return new Color(ColorFormat.HSL, hslImageDataAtPoint[0],
-        hslImageDataAtPoint[1], hslImageDataAtPoint[2]);
+    return new Color(
+        ColorFormat.HSL, hslImageDataAtPoint[0], hslImageDataAtPoint[1],
+        hslImageDataAtPoint[2]);
   }
 
   /**
@@ -873,8 +877,9 @@ class ColorPalette extends HTMLCanvasElement {
    * @param {!Color} color
    */
   fillHue(color) {
-    this.fillColor_ = new Color(ColorFormat.HSL, color.hValue,
-        this.fillColor_.sValue, this.fillColor_.lValue);
+    this.fillColor_ = new Color(
+        ColorFormat.HSL, color.hValue, this.fillColor_.sValue,
+        this.fillColor_.lValue);
     this.fillColorAndGradients_();
     this.pendingHueChange_ = true;
   }
@@ -944,9 +949,8 @@ class ColorPalette extends HTMLCanvasElement {
     return Math.ceil(this.getBoundingClientRect().bottom - 1);
   }
 }
-window.customElements.define('color-palette',
-                             ColorPalette,
-                             { extends: 'canvas' });
+window.customElements.define(
+    'color-palette', ColorPalette, { extends: 'canvas' });
 
 /**
  * ColorSelectionRing: Provides movement and color selection functionality to
@@ -1030,20 +1034,20 @@ class ColorSelectionRing extends HTMLElement {
 
   setElementPosition_() {
     if (this.height > this.backingColorPalette_.height) {
-      this.style.top = this.top
-          - (this.height - this.backingColorPalette_.height) / 2
-          - this.backingColorPalette_.top + 'px';
+      this.style.top = this.top -
+          (this.height - this.backingColorPalette_.height) / 2 -
+          this.backingColorPalette_.top + 'px';
     } else {
-      this.style.top = this.top - this.radius
-          - this.backingColorPalette_.top + 'px';
+      this.style.top =
+          this.top - this.radius - this.backingColorPalette_.top + 'px';
     }
     if (this.width > this.backingColorPalette_.width) {
-      this.style.left = this.left
-          - (this.width - this.backingColorPalette_.width) / 2
-          - this.backingColorPalette_.left + 'px';
+      this.style.left = this.left -
+          (this.width - this.backingColorPalette_.width) / 2 -
+          this.backingColorPalette_.left + 'px';
     } else {
-      this.style.left = this.left - this.radius
-          - this.backingColorPalette_.left + 'px';
+      this.style.left =
+          this.left - this.radius - this.backingColorPalette_.left + 'px';
     }
   }
 
@@ -1079,9 +1083,9 @@ class ColorSelectionRing extends HTMLElement {
    * @param {bool} accelerated
    */
   move(direction, accelerated) {
-    let shiftFactor = accelerated
-        ? ColorSelectionRing.ACCELERATED_MOVE_DISTANCE
-        : ColorSelectionRing.MOVE_DISTANCE;
+    let shiftFactor = accelerated ?
+        ColorSelectionRing.ACCELERATED_MOVE_DISTANCE :
+        ColorSelectionRing.MOVE_DISTANCE;
     if ((direction === Direction.UP) || (direction === Direction.LEFT)) {
       shiftFactor *= -1;
     }
@@ -1094,13 +1098,13 @@ class ColorSelectionRing extends HTMLElement {
         }
       } else {
         // direction === Direction.RIGHT
-        if (this.position_.x + shiftFactor >
-            this.backingColorPalette_.right) {
+        if (this.position_.x + shiftFactor > this.backingColorPalette_.right) {
           newX = this.backingColorPalette_.right;
         }
       }
       this.setX(newX);
-    } else if (this.canMoveVertically_ &&
+    } else if (
+        this.canMoveVertically_ &&
         ((direction === Direction.UP) || (direction === Direction.DOWN))) {
       let newY = this.position_.y + shiftFactor;
       if (direction === Direction.UP) {
@@ -1109,8 +1113,7 @@ class ColorSelectionRing extends HTMLElement {
         }
       } else {
         // direction === Direction.DOWN
-        if (this.position_.y + shiftFactor >
-            this.backingColorPalette_.bottom) {
+        if (this.position_.y + shiftFactor > this.backingColorPalette_.bottom) {
           newY = this.backingColorPalette_.bottom;
         }
       }
@@ -1166,20 +1169,21 @@ class ColorWell extends ColorSelectionArea {
     this.selectedColor_ = initialColor;
 
     this.resizeObserver_ = new ResizeObserver(() => {
-      let whiteGradient = this.colorPalette_.renderingContext
-          .createLinearGradient(0, 0, this.colorPalette_.offsetWidth, 0);
+      let whiteGradient =
+          this.colorPalette_.renderingContext.createLinearGradient(
+              0, 0, this.colorPalette_.offsetWidth, 0);
       whiteGradient.addColorStop(0.01, 'hsla(0, 0%, 100%, 1)');
       whiteGradient.addColorStop(0.99, 'hsla(0, 0%, 100%, 0)');
-      let blackGradient = this.colorPalette_.renderingContext
-          .createLinearGradient(0, this.colorPalette_.offsetHeight, 0, 0);
+      let blackGradient = this.colorPalette_.renderingContext.createLinearGradient(
+              0, this.colorPalette_.offsetHeight, 0, 0);
       blackGradient.addColorStop(0.01, 'hsla(0, 0%, 0%, 1)');
       blackGradient.addColorStop(0.99, 'hsla(0, 0%, 0%, 0)');
       this.colorPalette_.initialize(whiteGradient, blackGradient);
       this.colorPalette_.fillHue(this.fillColor_);
       this.colorSelectionRing_.initialize();
 
-      this.colorSelectionRing_.addEventListener('color-selection-ring-update',
-          this.onColorSelectionRingUpdate_);
+      this.colorSelectionRing_.addEventListener(
+          'color-selection-ring-update', this.onColorSelectionRingUpdate_);
 
       this.moveColorSelectionRingTo_(this.selectedColor_);
 
@@ -1201,26 +1205,30 @@ class ColorWell extends ColorSelectionArea {
           this.colorPalette_.nearestPointOnColorPalette(newPositionOrColor);
       this.colorSelectionRing_.moveTo(point);
     } else {
-      const closestHSLValueIndex = this.colorPalette_.hslImageData
-          .reduce((closestSoFar, {}, index, array) => {
+      const closestHSLValueIndex = this.colorPalette_.hslImageData.reduce(
+          (closestSoFar, {}, index, array) => {
             if ((index % 3) === 0) {
-              const currentHSLValueDistance = Color.distance([array[index],
-                  array[index + 1], array[index + 2]],
-                    newPositionOrColor.hslValues());
-              const closestHSLValueDistance =
-                  Color.distance([array[closestSoFar], array[closestSoFar + 1],
-                    array[closestSoFar + 2]], newPositionOrColor.hslValues());
+              const currentHSLValueDistance = Color.distance(
+                  [array[index], array[index + 1], array[index + 2]],
+                  newPositionOrColor.hslValues());
+              const closestHSLValueDistance = Color.distance(
+                  [
+                    array[closestSoFar], array[closestSoFar + 1],
+                    array[closestSoFar + 2]
+                  ],
+                  newPositionOrColor.hslValues());
               if (currentHSLValueDistance < closestHSLValueDistance) {
                 return index;
               }
             }
             return closestSoFar;
-          }, 0);
+          },
+          0);
       const offsetX = (closestHSLValueIndex / 3) % this.colorPalette_.width;
       const offsetY =
           Math.floor((closestHSLValueIndex / 3) / this.colorPalette_.width);
-      this.colorSelectionRing_.set(this.colorPalette_.left + offsetX,
-                                  this.colorPalette_.top + offsetY);
+      this.colorSelectionRing_.set(
+          this.colorPalette_.left + offsetX, this.colorPalette_.top + offsetY);
     }
   }
 
@@ -1255,12 +1263,9 @@ class ColorWell extends ColorSelectionArea {
 
   onColorSelectionRingUpdate_ = () => {
     this.selectedColor_ = this.colorSelectionRing_.color;
-    this.dispatchEvent(new CustomEvent('visual-color-change', {
-      bubbles: true,
-      detail: {
-        color: this.selectedColor
-      }
-    }));
+    this.dispatchEvent(new CustomEvent(
+      'visual-color-change',
+      {bubbles: true, detail: {color: this.selectedColor}}));
   }
 }
 window.customElements.define('color-well', ColorWell);
@@ -1278,8 +1283,9 @@ class HueSlider extends ColorSelectionArea {
     this.color_ = new Color(ColorFormat.HSL, initialColor.hValue, 100, 50);
 
     this.resizeObserver_ = new ResizeObserver(() => {
-      let hueSliderPaletteGradient = this.colorPalette_.renderingContext
-          .createLinearGradient(0, 0, this.colorPalette_.offsetWidth, 0);
+      let hueSliderPaletteGradient =
+          this.colorPalette_.renderingContext.createLinearGradient(
+              0, 0, this.colorPalette_.offsetWidth, 0);
       hueSliderPaletteGradient.addColorStop(0.01, 'hsl(0, 100%, 50%)');
       hueSliderPaletteGradient.addColorStop(0.17, 'hsl(300, 100%, 50%)');
       hueSliderPaletteGradient.addColorStop(0.33, 'hsl(240, 100%, 50%)');
@@ -1290,8 +1296,8 @@ class HueSlider extends ColorSelectionArea {
       this.colorPalette_.initialize(hueSliderPaletteGradient);
       this.colorSelectionRing_.initialize();
 
-      this.colorSelectionRing_.addEventListener('color-selection-ring-update',
-          this.onColorSelectionRingUpdate_);
+      this.colorSelectionRing_.addEventListener(
+          'color-selection-ring-update', this.onColorSelectionRingUpdate_);
 
       this.moveColorSelectionRingTo_(this.color_);
 
@@ -1315,15 +1321,16 @@ class HueSlider extends ColorSelectionArea {
     } else {
       const targetHValue = newPositionOrColor.hValue;
       if (targetHValue !== this.colorSelectionRing_.color.hValue) {
-        const closestHValueIndex = this.colorPalette_.hslImageData
-            .reduce((closestHValueIndexSoFar, currentHValue, index, array) => {
+        const closestHValueIndex = this.colorPalette_.hslImageData.reduce(
+            (closestHValueIndexSoFar, currentHValue, index, array) => {
               if ((index % 3 === 0) &&
                   (Math.abs(currentHValue - targetHValue) <
-                    Math.abs(array[closestHValueIndexSoFar] - targetHValue))) {
+                  Math.abs(array[closestHValueIndexSoFar] - targetHValue))) {
                 return index;
               }
               return closestHValueIndexSoFar;
-        }, 0);
+            },
+            0);
         const offsetX = (closestHValueIndex / 3) % this.colorPalette_.width;
         this.colorSelectionRing_.setX(this.colorPalette_.left + offsetX);
       }
@@ -1346,9 +1353,7 @@ class HueSlider extends ColorSelectionArea {
 
   onColorSelectionRingUpdate_ = () => {
     this.color_ = this.colorSelectionRing_.color;
-    this.dispatchEvent(new CustomEvent('hue-slider-update', {
-      bubbles: true
-    }));
+    this.dispatchEvent(new CustomEvent('hue-slider-update', {bubbles: true}));
   }
 }
 window.customElements.define('hue-slider', HueSlider);
@@ -1364,12 +1369,12 @@ class ManualColorPicker extends HTMLElement {
   constructor(initialColor) {
     super();
 
-    this.hexValueContainer_ = new ColorValueContainer(ColorChannel.HEX,
-                                                      initialColor);
-    this.rgbValueContainer_ = new ColorValueContainer(ColorFormat.RGB,
-                                                      initialColor);
-    this.hslValueContainer_ = new ColorValueContainer(ColorFormat.HSL,
-                                                      initialColor);
+    this.hexValueContainer_ =
+        new ColorValueContainer(ColorChannel.HEX, initialColor);
+    this.rgbValueContainer_ =
+        new ColorValueContainer(ColorFormat.RGB, initialColor);
+    this.hslValueContainer_ =
+        new ColorValueContainer(ColorFormat.HSL, initialColor);
     this.colorValueContainers_ = [
       this.hexValueContainer_,
       this.rgbValueContainer_,
@@ -1380,8 +1385,7 @@ class ManualColorPicker extends HTMLElement {
     this.formatToggler_ = new FormatToggler(this.currentColorFormat_);
     this.append(...this.colorValueContainers_, this.formatToggler_);
 
-    this.formatToggler_
-    .addEventListener('format-change', this.onFormatChange_);
+    this.formatToggler_.addEventListener('format-change', this.onFormatChange_);
 
     this.addEventListener('manual-color-change', this.onManualColorChange_);
   }
@@ -1415,8 +1419,8 @@ class ManualColorPicker extends HTMLElement {
    * @param {!Color} newColor
    */
   set color(newColor) {
-    this.colorValueContainers_.forEach((colorValueContainer) =>
-        colorValueContainer.color = newColor);
+    this.colorValueContainers_.forEach(
+      (colorValueContainer) => colorValueContainer.color = newColor);
   }
 }
 window.customElements.define('manual-color-picker', ManualColorPicker);
@@ -1436,35 +1440,33 @@ class ColorValueContainer extends HTMLElement {
     this.colorFormat_ = colorFormat;
     this.channelValueContainers_ = [];
     if (this.colorFormat_ === ColorFormat.HEX) {
-      const hexValueContainer = new ChannelValueContainer(ColorChannel.HEX,
-                                                          initialColor);
+      const hexValueContainer =
+          new ChannelValueContainer(ColorChannel.HEX, initialColor);
       this.channelValueContainers_.push(hexValueContainer);
     } else if (this.colorFormat_ === ColorFormat.RGB) {
-      const rValueContainer = new ChannelValueContainer(ColorChannel.R,
-                                                        initialColor);
-      const gValueContainer = new ChannelValueContainer(ColorChannel.G,
-                                                        initialColor);
-      const bValueContainer = new ChannelValueContainer(ColorChannel.B,
-                                                        initialColor);
-      this.channelValueContainers_.push(rValueContainer,
-                                        gValueContainer,
-                                        bValueContainer);
+      const rValueContainer =
+          new ChannelValueContainer(ColorChannel.R, initialColor);
+      const gValueContainer =
+          new ChannelValueContainer(ColorChannel.G, initialColor);
+      const bValueContainer =
+          new ChannelValueContainer(ColorChannel.B, initialColor);
+      this.channelValueContainers_.push(
+          rValueContainer, gValueContainer, bValueContainer);
     } else if (this.colorFormat_ === ColorFormat.HSL) {
-      const hValueContainer = new ChannelValueContainer(ColorChannel.H,
-                                                        initialColor);
-      const sValueContainer = new ChannelValueContainer(ColorChannel.S,
-                                                        initialColor);
-      const lValueContainer = new ChannelValueContainer(ColorChannel.L,
-                                                        initialColor);
-      this.channelValueContainers_.push(hValueContainer,
-                                        sValueContainer,
-                                        lValueContainer);
+      const hValueContainer =
+          new ChannelValueContainer(ColorChannel.H, initialColor);
+      const sValueContainer =
+          new ChannelValueContainer(ColorChannel.S, initialColor);
+      const lValueContainer =
+          new ChannelValueContainer(ColorChannel.L, initialColor);
+      this.channelValueContainers_.push(
+          hValueContainer, sValueContainer, lValueContainer);
     }
     this.append(...this.channelValueContainers_);
 
-    this.channelValueContainers_.forEach((channelValueContainer) =>
-        channelValueContainer.addEventListener('input',
-            this.onChannelValueChange_));
+    this.channelValueContainers_.forEach(
+        (channelValueContainer) => channelValueContainer.addEventListener(
+            'input', this.onChannelValueChange_));
   }
 
   get colorFormat() {
@@ -1472,17 +1474,18 @@ class ColorValueContainer extends HTMLElement {
   }
 
   get color() {
-    return new Color(this.colorFormat_,
-        ...this.channelValueContainers_.map((channelValueContainer) =>
-            channelValueContainer.channelValue));
+    return new Color(
+        this.colorFormat_,
+        ...this.channelValueContainers_.map(
+            (channelValueContainer) => channelValueContainer.channelValue));
   }
 
   /**
    * @param {!Color} color
    */
   set color(color) {
-    this.channelValueContainers_.forEach((channelValueContainer) =>
-        channelValueContainer.setValue(color));
+    this.channelValueContainers_.forEach(
+        (channelValueContainer) => channelValueContainer.setValue(color));
   }
 
   show() {
@@ -1494,12 +1497,8 @@ class ColorValueContainer extends HTMLElement {
   }
 
   onChannelValueChange_ = () => {
-    this.dispatchEvent(new CustomEvent('manual-color-change', {
-      bubbles: true,
-      detail: {
-        color: this.color
-      }
-    }));
+    this.dispatchEvent(new CustomEvent(
+        'manual-color-change', {bubbles: true, detail: {color: this.color}}));
   }
 }
 window.customElements.define('color-value-container', ColorValueContainer);
@@ -1518,7 +1517,7 @@ class ChannelValueContainer extends HTMLInputElement {
 
     this.setAttribute('type', 'text');
     this.colorChannel_ = colorChannel;
-    switch(colorChannel) {
+    switch (colorChannel) {
       case ColorChannel.HEX:
         this.setAttribute('id', 'hexValueContainer');
         this.setAttribute('maxlength', '7');
@@ -1563,7 +1562,7 @@ class ChannelValueContainer extends HTMLInputElement {
    * @param {!Color} color
    */
   setValue(color) {
-    switch(this.colorChannel_) {
+    switch (this.colorChannel_) {
       case ColorChannel.HEX:
         if (this.channelValue_ !== color.hexValue) {
           this.channelValue_ = color.hexValue;
@@ -1649,9 +1648,8 @@ class ChannelValueContainer extends HTMLInputElement {
     }
   }
 }
-window.customElements.define('channel-value-container',
-                             ChannelValueContainer,
-                             { extends: 'input' });
+window.customElements.define(
+    'channel-value-container', ChannelValueContainer, { extends: 'input' });
 
 /**
  * FormatToggler: Button that powers switching between different color formats.
@@ -1697,9 +1695,8 @@ class FormatToggler extends HTMLElement {
    */
   updateColorFormat_(choosePreviousFormat) {
     const numFormats = Object.keys(ColorFormat).length;
-    const newValue = choosePreviousFormat
-        ? this.currentColorFormat_ - 1
-        : this.currentColorFormat_ + 1;
+    const newValue = choosePreviousFormat ? this.currentColorFormat_ - 1 :
+                                            this.currentColorFormat_ + 1;
     const newColorFormatKey = Object.keys(ColorFormat).filter((key) => {
       return ColorFormat[key] ===
           (((newValue % numFormats) + numFormats) % numFormats);
@@ -1708,11 +1705,8 @@ class FormatToggler extends HTMLElement {
 
     this.adjustFormatLabelVisibility_();
 
-    this.dispatchEvent(new CustomEvent('format-change', {
-      detail: {
-        colorFormat: this.currentColorFormat_
-      }
-    }));
+    this.dispatchEvent(new CustomEvent(
+        'format-change', {detail: {colorFormat: this.currentColorFormat_}}));
   }
 
   adjustFormatLabelVisibility_() {
@@ -1734,7 +1728,7 @@ class FormatToggler extends HTMLElement {
    * @param {!Event} event
    */
   onKeyDown_ = (event) => {
-    switch(event.key) {
+    switch (event.key) {
       case 'ArrowUp':
         this.updateColorFormat_(true);
         break;
@@ -1765,16 +1759,14 @@ class FormatLabel extends HTMLElement {
       this.rChannelLabel_ = new ChannelLabel(ColorChannel.R);
       this.gChannelLabel_ = new ChannelLabel(ColorChannel.G);
       this.bChannelLabel_ = new ChannelLabel(ColorChannel.B);
-      this.append(this.rChannelLabel_,
-                  this.gChannelLabel_,
-                  this.bChannelLabel_);
+      this.append(
+          this.rChannelLabel_, this.gChannelLabel_, this.bChannelLabel_);
     } else if (colorFormat === ColorFormat.HSL) {
       this.hChannelLabel_ = new ChannelLabel(ColorChannel.H);
       this.sChannelLabel_ = new ChannelLabel(ColorChannel.S);
       this.lChannelLabel_ = new ChannelLabel(ColorChannel.L);
-      this.append(this.hChannelLabel_,
-                  this.sChannelLabel_,
-                  this.lChannelLabel_);
+      this.append(
+          this.hChannelLabel_, this.sChannelLabel_, this.lChannelLabel_);
     }
   }
 
@@ -1836,19 +1828,21 @@ class SubmissionControls extends HTMLElement {
     padding.setAttribute('id', 'submission-controls-padding');
     this.append(padding);
 
-    this.submitButton_ = new SubmissionButton(submitCallback,
+    this.submitButton_ = new SubmissionButton(
+        submitCallback,
         '<svg width="14" height="10" viewBox="0 0 14 10" fill="none" ' +
-        'xmlns="http://www.w3.org/2000/svg"><path d="M13.3516 ' +
-        '1.35156L5 9.71094L0.648438 5.35156L1.35156 4.64844L5 ' +
-        '8.28906L12.6484 0.648438L13.3516 1.35156Z" fill="black"/></svg>'
+            'xmlns="http://www.w3.org/2000/svg"><path d="M13.3516 ' +
+            '1.35156L5 9.71094L0.648438 5.35156L1.35156 4.64844L5 ' +
+            '8.28906L12.6484 0.648438L13.3516 1.35156Z" fill="black"/></svg>'
     );
-    this.cancelButton_ = new SubmissionButton(cancelCallback,
+    this.cancelButton_ = new SubmissionButton(
+        cancelCallback,
         '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" ' +
-        'xmlns="http://www.w3.org/2000/svg"><path d="M7.71094 7L13.1016 ' +
-        '12.3984L12.3984 13.1016L7 7.71094L1.60156 13.1016L0.898438 ' +
-        '12.3984L6.28906 7L0.898438 1.60156L1.60156 0.898438L7 ' +
-        '6.28906L12.3984 0.898438L13.1016 1.60156L7.71094 7Z" ' +
-        'fill="black"/></svg>'
+            'xmlns="http://www.w3.org/2000/svg"><path d="M7.71094 7L13.1016 ' +
+            '12.3984L12.3984 13.1016L7 7.71094L1.60156 13.1016L0.898438 ' +
+            '12.3984L6.28906 7L0.898438 1.60156L1.60156 0.898438L7 ' +
+            '6.28906L12.3984 0.898438L13.1016 1.60156L7.71094 7Z" ' +
+            'fill="black"/></svg>'
     );
     this.append(this.submitButton_, this.cancelButton_);
   }
