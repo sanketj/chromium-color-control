@@ -963,7 +963,7 @@ class ColorSelectionRing extends HTMLElement {
   constructor(backingColorPalette) {
     super();
 
-    this.setAttribute('tabIndex', '0');
+    this.setAttribute('tabIndex', 0);
     this.backingColorPalette_ = backingColorPalette;
     this.position_ = new Point(0, 0);
     this.drag_ = false;
@@ -1661,7 +1661,7 @@ class FormatToggler extends HTMLElement {
   constructor(initialColorFormat) {
     super();
 
-    this.setAttribute('tabIndex', '0');
+    this.setAttribute('tabIndex', 0);
     this.currentColorFormat_ = initialColorFormat;
     this.hexFormatLabel_ = new FormatLabel(ColorFormat.HEX);
     this.rgbFormatLabel_ = new FormatLabel(ColorFormat.RGB);
@@ -1834,8 +1834,7 @@ class SubmissionControls extends HTMLElement {
         '<svg width="14" height="10" viewBox="0 0 14 10" fill="none" ' +
             'xmlns="http://www.w3.org/2000/svg"><path d="M13.3516 ' +
             '1.35156L5 9.71094L0.648438 5.35156L1.35156 4.64844L5 ' +
-            '8.28906L12.6484 0.648438L13.3516 1.35156Z" fill="WindowText"/></svg>'
-    );
+            '8.28906L12.6484 0.648438L13.3516 1.35156Z" fill="WindowText"/></svg>');
     this.cancelButton_ = new SubmissionButton(
         cancelCallback,
         '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" ' +
@@ -1843,8 +1842,7 @@ class SubmissionControls extends HTMLElement {
             '12.3984L12.3984 13.1016L7 7.71094L1.60156 13.1016L0.898438 ' +
             '12.3984L6.28906 7L0.898438 1.60156L1.60156 0.898438L7 ' +
             '6.28906L12.3984 0.898438L13.1016 1.60156L7.71094 7Z" ' +
-            'fill="WindowText"/></svg>'
-    );
+            'fill="WindowText"/></svg>');
     this.append(this.submitButton_, this.cancelButton_);
   }
 
