@@ -515,22 +515,27 @@ class ColorPicker extends HTMLElement {
         break;
       case 'Tab':
         event.preventDefault();
-        const focusableElements = Array.from(this.querySelectorAll(
+        if (this.focusableElements_ === undefined) {
+          this.focusableElements_ = Array.from(this.querySelectorAll(
             'color-value-container:not(.hidden-color-value-container)' +
             ' > input, [tabindex]:not([tabindex=\'-1\'])'));
-        const currentFocusIndex =
-            focusableElements.indexOf(document.activeElement);
-        let nextFocusIndex;
-        if (event.shiftKey) {
-          nextFocusIndex = (currentFocusIndex > 0) ?
-              currentFocusIndex - 1 :
-              focusableElements.length - 1;
-        } else {
-          nextFocusIndex = (currentFocusIndex < focusableElements.length - 1) ?
-              currentFocusIndex + 1 :
-              0;
         }
-        focusableElements[nextFocusIndex].focus({preventScroll: true});
+        if (this.focusableElements_.length > 0) {
+          const currentFocusIndex =
+          this.focusableElements_.indexOf(document.activeElement);
+          let nextFocusIndex;
+          if (event.shiftKey) {
+            nextFocusIndex = (currentFocusIndex > 0) ?
+                currentFocusIndex - 1 :
+                this.focusableElements_.length - 1;
+          } else {
+            nextFocusIndex =
+                (currentFocusIndex < this.focusableElements_.length - 1) ?
+                currentFocusIndex + 1 :
+                0;
+          }
+          this.focusableElements_[nextFocusIndex].focus({preventScroll: true});
+        }
         break;
     }
   }
