@@ -513,6 +513,25 @@ class ColorPicker extends HTMLElement {
       case 'Escape':
         this.submissionControls_.cancelButton.click();
         break;
+      case 'Tab':
+        event.preventDefault();
+        const focusableElements = Array.from(this.querySelectorAll(
+            'color-value-container:not(.hidden-color-value-container)' +
+            ' > input, [tabindex]:not([tabindex=\'-1\'])'));
+        const currentFocusIndex =
+            focusableElements.indexOf(document.activeElement);
+        let nextFocusIndex;
+        if (event.shiftKey) {
+          nextFocusIndex = (currentFocusIndex > 0) ?
+              currentFocusIndex - 1 :
+              focusableElements.length - 1;
+        } else {
+          nextFocusIndex = (currentFocusIndex < focusableElements.length - 1) ?
+              currentFocusIndex + 1 :
+              0;
+        }
+        focusableElements[nextFocusIndex].focus({preventScroll: true});
+        break;
     }
   }
 
@@ -745,7 +764,7 @@ class ColorSelectionArea extends HTMLElement {
    * @param {!Point} point
    */
   mouseDown(point) {
-    this.focused_ = true;
+    this.colorSelectionRing_.focus({preventScroll: true});
     this.colorSelectionRing_.drag = true;
     this.moveColorSelectionRingTo_(point);
   }
