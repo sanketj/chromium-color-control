@@ -517,12 +517,12 @@ class ColorPicker extends HTMLElement {
         event.preventDefault();
         if (this.focusableElements_ === undefined) {
           this.focusableElements_ = Array.from(this.querySelectorAll(
-            'color-value-container:not(.hidden-color-value-container)' +
-            ' > input, [tabindex]:not([tabindex=\'-1\'])'));
+              'color-value-container:not(.hidden-color-value-container)' +
+              ' > input, [tabindex]:not([tabindex=\'-1\'])'));
         }
         if (this.focusableElements_.length > 0) {
           const currentFocusIndex =
-          this.focusableElements_.indexOf(document.activeElement);
+              this.focusableElements_.indexOf(document.activeElement);
           let nextFocusIndex;
           if (event.shiftKey) {
             nextFocusIndex = (currentFocusIndex > 0) ?
