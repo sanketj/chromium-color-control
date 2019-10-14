@@ -520,19 +520,17 @@ class ColorPicker extends HTMLElement {
         if (this.focusableElements_ === undefined) {
           this.updateFocusableElements_();
         }
-        if (this.focusableElements_.length > 0) {
+        const length = this.focusableElements_.length;
+        if (length > 0) {
           const currentFocusIndex =
               this.focusableElements_.indexOf(document.activeElement);
           let nextFocusIndex;
           if (event.shiftKey) {
             nextFocusIndex = (currentFocusIndex > 0) ?
                 currentFocusIndex - 1 :
-                this.focusableElements_.length - 1;
+                length - 1;
           } else {
-            nextFocusIndex =
-                (currentFocusIndex < this.focusableElements_.length - 1) ?
-                currentFocusIndex + 1 :
-                0;
+            nextFocusIndex = (currentFocusIndex + 1) % length;
           }
           this.focusableElements_[nextFocusIndex].focus({preventScroll: true});
         }
