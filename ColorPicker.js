@@ -444,6 +444,8 @@ class ColorPicker extends HTMLElement {
 
     this.addEventListener('visual-color-change', this.onVisualColorChange_);
 
+    this.addEventListener('format-change', this.updateFocusableElements_);
+
     document.documentElement.addEventListener('keydown', this.onKeyDown_);
   }
 
@@ -516,9 +518,7 @@ class ColorPicker extends HTMLElement {
       case 'Tab':
         event.preventDefault();
         if (this.focusableElements_ === undefined) {
-          this.focusableElements_ = Array.from(this.querySelectorAll(
-              'color-value-container:not(.hidden-color-value-container)' +
-              ' > input, [tabindex]:not([tabindex=\'-1\'])'));
+          this.updateFocusableElements_();
         }
         if (this.focusableElements_.length > 0) {
           const currentFocusIndex =
@@ -538,6 +538,12 @@ class ColorPicker extends HTMLElement {
         }
         break;
     }
+  }
+
+  updateFocusableElements_ = () => {
+    this.focusableElements_ = Array.from(this.querySelectorAll(
+        'color-value-container:not(.hidden-color-value-container) > input,' +
+        '[tabindex]:not([tabindex=\'-1\'])'));
   }
 
   static get COMMIT_DELAY_MS() {
@@ -1731,7 +1737,8 @@ class FormatToggler extends HTMLElement {
     this.adjustFormatLabelVisibility_();
 
     this.dispatchEvent(new CustomEvent(
-        'format-change', {detail: {colorFormat: this.currentColorFormat_}}));
+        'format-change',
+        {bubbles: true, detail: {colorFormat: this.currentColorFormat_}}));
   }
 
   adjustFormatLabelVisibility_() {
