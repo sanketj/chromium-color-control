@@ -1688,7 +1688,7 @@ class ChannelValueContainer extends HTMLInputElement {
   }
 
   onBlur_ = () => {
-    switch(this.colorChannel_) {
+    switch (this.colorChannel_) {
       case ColorChannel.HEX:
         if (this.channelValue_ !== Number(this.value.substr(1))) {
           this.value = '#' + this.channelValue_;
@@ -1698,9 +1698,9 @@ class ChannelValueContainer extends HTMLInputElement {
       case ColorChannel.G:
       case ColorChannel.B:
       case ColorChannel.H:
-          if (this.channelValue_ !== Number(this.value)) {
-            this.value = this.channelValue_;
-          }
+        if (this.channelValue_ !== Number(this.value)) {
+          this.value = this.channelValue_;
+        }
         break;
       case ColorChannel.S:
       case ColorChannel.L:
