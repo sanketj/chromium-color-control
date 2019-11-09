@@ -1,4 +1,4 @@
-This repository exists solely for developer convenience when making changes to the color picker for `<input type="color" />` in Chromium.
+This repository exists solely for convenient development of the color picker for `<input type="color" />` in Chromium.
 Please do not make any changes to the JS and CSS files without corresponding changes in the Chromium repository.
 All rights belong to "The Chromium Authors".
 
