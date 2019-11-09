@@ -3,4 +3,5 @@ Please do not make any changes to the JS and CSS files without corresponding cha
 All rights belong to "The Chromium Authors".
 
 JS code in the Chromium project: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/forms/resources/color_picker.js
+
 CSS code in the Chromium project: https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/html/forms/resources/color_picker.css
