@@ -6,29 +6,28 @@
  * @fileoverview Color picker used by <input type='color' />
  */
 
-// FIXME: Uncomment the block below when submitting to Chromium.
-// function initializeColorPicker() {
-//   if (global.params.selectedColor === undefined) {
-//     global.params.selectedColor = DefaultColor;
-//   }
-//   const colorPicker = new ColorPicker(new Color(global.params.selectedColor));
-//   main.append(colorPicker);
-//   const width = colorPicker.offsetWidth;
-//   const height = colorPicker.offsetHeight;
-//   resizeWindow(width, height);
-// }
+function initializeColorPicker() {
+  if (global.params.selectedColor === undefined) {
+    global.params.selectedColor = DefaultColor;
+  }
+  const colorPicker = new ColorPicker(new Color(global.params.selectedColor));
+  main.append(colorPicker);
+  const width = colorPicker.offsetWidth;
+  const height = colorPicker.offsetHeight;
+  resizeWindow(width, height);
+}
 
-// /**
-//  * @param {!Object} args
-//  * @return {?string} An error message, or null if the argument has no errors.
-//  */
-// function validateColorPickerArguments(args) {
-//   if (args.shouldShowColorSuggestionPicker)
-//     return 'Should be showing the color suggestion picker.';
-//   if (!args.selectedColor)
-//     return 'No selectedColor.';
-//   return null;
-// }
+/**
+ * @param {!Object} args
+ * @return {?string} An error message, or null if the argument has no errors.
+ */
+function validateColorPickerArguments(args) {
+  if (args.shouldShowColorSuggestionPicker)
+    return 'Should be showing the color suggestion picker.';
+  if (!args.selectedColor)
+    return 'No selectedColor.';
+  return null;
+}
 
 /**
  * Supported movement directions.
@@ -360,7 +359,8 @@ class Color {
    * Both color triples must be of the same color format.
    */
   static distance(colorTripleA, colorTripleB) {
-    return Math.sqrt(Math.pow(colorTripleA[0] - colorTripleB[0], 2) +
+    return Math.sqrt(
+        Math.pow(colorTripleA[0] - colorTripleB[0], 2) +
         Math.pow(colorTripleA[1] - colorTripleB[1], 2) +
         Math.pow(colorTripleA[2] - colorTripleB[2], 2));
   }
@@ -454,10 +454,6 @@ class ColorPicker extends HTMLElement {
    * @param {!Color} newColor
    */
   set selectedColor(newColor) {
-    if (!this.selectedColor_.equals(newColor)) {
-      this.dispatchEvent(new CustomEvent('color-change'));
-    }
-    // FIXME: Remove the block above when submitting to Chromium.
     this.selectedColor_ = newColor;
   }
 
@@ -482,9 +478,8 @@ class ColorPicker extends HTMLElement {
       this.visualColorPicker_.color = newColor;
       this.processingManualColorChange_ = false;
 
-      // FIXME: Uncomment the block below when submitting to Chromium.
-      // const selectedValue = newColor.asHex();
-      // window.pagePopupController.setValue(selectedValue);
+      const selectedValue = newColor.asHex();
+      window.pagePopupController.setValue(selectedValue);
     }
   }
 
@@ -498,9 +493,8 @@ class ColorPicker extends HTMLElement {
         this.selectedColor = newColor;
         this.manualColorPicker_.color = newColor;
 
-        // FIXME: Uncomment the block below when submitting to Chromium.
-        // const selectedValue = newColor.asHex();
-        // window.pagePopupController.setValue(selectedValue);
+        const selectedValue = newColor.asHex();
+        window.pagePopupController.setValue(selectedValue);
       } else {
         // We are making a visual color change in response to a manual color
         // change. So we do not overwrite the manually specified values and do
@@ -515,13 +509,11 @@ class ColorPicker extends HTMLElement {
   onKeyDown_ = (event) => {
     switch(event.key) {
       case 'Enter':
-        // FIXME: Uncomment the block below when submitting to Chromium.
-        // window.pagePopupController.closePopup();
+        window.pagePopupController.closePopup();
         break;
       case 'Escape':
         if (this.selectedColor.equals(this.colorWhenOpened_)) {
-          // FIXME: Uncomment the block below when submitting to Chromium.
-          // window.pagePopupController.closePopup();
+          window.pagePopupController.closePopup();
         } else {
           this.manualColorPicker_.dispatchEvent(new CustomEvent(
               'manual-color-change',
@@ -984,7 +976,7 @@ class ColorPalette extends HTMLCanvasElement {
   }
 }
 window.customElements.define(
-    'color-palette', ColorPalette, { extends: 'canvas' });
+    'color-palette', ColorPalette, {extends: 'canvas'});
 
 /**
  * ColorSelectionRing: Provides movement and color selection functionality to
@@ -1208,7 +1200,8 @@ class ColorWell extends ColorSelectionArea {
               0, 0, this.colorPalette_.offsetWidth, 0);
       whiteGradient.addColorStop(0.01, 'hsla(0, 0%, 100%, 1)');
       whiteGradient.addColorStop(0.99, 'hsla(0, 0%, 100%, 0)');
-      let blackGradient = this.colorPalette_.renderingContext.createLinearGradient(
+      let blackGradient =
+          this.colorPalette_.renderingContext.createLinearGradient(
               0, this.colorPalette_.offsetHeight, 0, 0);
       blackGradient.addColorStop(0.01, 'hsla(0, 0%, 0%, 1)');
       blackGradient.addColorStop(0.99, 'hsla(0, 0%, 0%, 0)');
@@ -1298,8 +1291,8 @@ class ColorWell extends ColorSelectionArea {
   onColorSelectionRingUpdate_ = () => {
     this.selectedColor_ = this.colorSelectionRing_.color;
     this.dispatchEvent(new CustomEvent(
-      'visual-color-change',
-      {bubbles: true, detail: {color: this.selectedColor}}));
+        'visual-color-change',
+        {bubbles: true, detail: {color: this.selectedColor}}));
   }
 }
 window.customElements.define('color-well', ColorWell);
@@ -1359,7 +1352,7 @@ class HueSlider extends ColorSelectionArea {
             (closestHValueIndexSoFar, currentHValue, index, array) => {
               if ((index % 3 === 0) &&
                   (Math.abs(currentHValue - targetHValue) <
-                  Math.abs(array[closestHValueIndexSoFar] - targetHValue))) {
+                   Math.abs(array[closestHValueIndexSoFar] - targetHValue))) {
                 return index;
               }
               return closestHValueIndexSoFar;
@@ -1454,7 +1447,7 @@ class ManualColorPicker extends HTMLElement {
    */
   set color(newColor) {
     this.colorValueContainers_.forEach(
-      (colorValueContainer) => colorValueContainer.color = newColor);
+        (colorValueContainer) => colorValueContainer.color = newColor);
   }
 }
 window.customElements.define('manual-color-picker', ManualColorPicker);
@@ -1647,7 +1640,7 @@ class ChannelValueContainer extends HTMLInputElement {
     // Set this.channelValue_ based on the element's new value.
     let value = this.value;
     if (value) {
-      switch(this.colorChannel_) {
+      switch (this.colorChannel_) {
         case ColorChannel.HEX:
           if (value.startsWith('#')) {
             value = value.substr(1).toLowerCase();
@@ -1709,7 +1702,7 @@ class ChannelValueContainer extends HTMLInputElement {
   }
 }
 window.customElements.define(
-    'channel-value-container', ChannelValueContainer, { extends: 'input' });
+    'channel-value-container', ChannelValueContainer, {extends: 'input'});
 
 /**
  * FormatToggler: Button that powers switching between different color formats.
@@ -1784,7 +1777,7 @@ class FormatToggler extends HTMLElement {
   onClick_ = () => {
     this.focus();
     this.updateColorFormat_(false);
-  }
+  };
 
   /**
    * @param {!Event} event
