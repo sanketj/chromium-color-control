@@ -444,6 +444,8 @@ class ColorPicker extends HTMLElement {
     this.addEventListener('format-change', this.updateFocusableElements_);
 
     document.documentElement.addEventListener('keydown', this.onKeyDown_);
+
+    window.addEventListener('resize', this.onWindowResize_, {once: true});
   }
 
   get selectedColor() {
@@ -507,7 +509,7 @@ class ColorPicker extends HTMLElement {
    * @param {!Event} event
    */
   onKeyDown_ = (event) => {
-    switch(event.key) {
+    switch (event.key) {
       case 'Enter':
         window.pagePopupController.closePopup();
         break;
@@ -531,9 +533,8 @@ class ColorPicker extends HTMLElement {
               this.focusableElements_.indexOf(document.activeElement);
           let nextFocusIndex;
           if (event.shiftKey) {
-            nextFocusIndex = (currentFocusIndex > 0) ?
-                currentFocusIndex - 1 :
-                length - 1;
+            nextFocusIndex =
+                (currentFocusIndex > 0) ? currentFocusIndex - 1 : length - 1;
           } else {
             nextFocusIndex = (currentFocusIndex + 1) % length;
           }
@@ -547,6 +548,14 @@ class ColorPicker extends HTMLElement {
     this.focusableElements_ = Array.from(this.querySelectorAll(
         'color-value-container:not(.hidden-color-value-container) > input,' +
         '[tabindex]:not([tabindex=\'-1\'])'));
+  }
+
+  onWindowResize_ = () => {
+    // Set focus on the first focusable element.
+    if (this.focusableElements_ === undefined) {
+      this.updateFocusableElements_();
+    }
+    this.focusableElements_[0].focus({preventScroll: true});
   }
 }
 window.customElements.define('color-picker', ColorPicker);
