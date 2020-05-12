@@ -2,7 +2,6 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-
 body {
   font-family: sans-serif;
 }
@@ -73,6 +72,10 @@ hue-slider > canvas {
   height: 11px;
   margin-top: 7%;
   width: 100%;
+}
+
+canvas {
+  touch-action: none;
 }
 
 color-selection-ring {
